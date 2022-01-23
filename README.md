@@ -1,5 +1,5 @@
 # Methods 2: The General Linear Model
-
+Link to your GitHubs & a place to ask questions. https://cryptpad.fr/pad/#/3/pad/edit/a77ff1d63b229b37bd939a3eb69a9607/
 
 ## Overview
 
