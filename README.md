@@ -39,4 +39,6 @@ Should you want to deepen your knowledge of the mathematical content, I can reco
 <sup>2</sup> Gill, J. (2006). *Essential Mathematics for Political and Social Research* (Analytical Methods for Social Research). Cambridge: Cambridge University Press. [doi:10.1017/CBO9780511606656](https://doi.org/10.1017/CBO9780511606656)
 
 
+## Videos
 
+This whole course (with a few exceptions) [is on YouTube](https://www.youtube.com/playlist?list=PLvJwKACYy5_MTdnrzxx_1sN389dS9OB3S)! These videos are from last year's course which took place under lockdown conditions. This year, we're going to cover topics in a slightly different order, starting with an introduction to regression modelling before we go into linear algebra and calculus. This means the videos will be less relevant during the first three weeks of the course, but from then on, you can watch them in the order of the playlist.
