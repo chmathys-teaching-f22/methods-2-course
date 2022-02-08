@@ -1,0 +1,156 @@
+---
+title: "Week 1 solution"
+author: "Sigurd Fyhn Sørensen"
+date: "2/3/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+pacman::p_load(rstanarm,tidyverse, ggpubr)
+```
+
+# 1.2
+Predicting percentage vote to incumbent party. A linear relationship is given.
+Simulate data with different residual standard deviataions.
+
+```{r}
+# y = 46.3 + 3x + error
+x1=rnorm(1e4,2,2/4)
+#Simulate such data with residual std = 3.9
+error=rnorm(1e4,0,3.9)
+
+y1=46.3+(3*x1)+error
+
+
+df_12 <- data_frame(x1 = x1, y1 = y1)
+
+model <- stan_glm(y1~x1, data = df_12, refresh = 0)
+summary(model)
+```
+
+
+```{r}
+plot(x = x1, y = y1,)
+abline(a = model$coefficients[1], b = model$coefficients[2])
+```
+
+```{r}
+
+x2=rnorm(1e4,2, 2/4)
+#Simulate such data with residual std = 10
+error2=rnorm(1e4,0,10)
+
+y2=46.3+(3*x2)+error2
+
+df_12 <- df_12 %>% 
+  mutate(x2 = x2) %>% 
+  mutate(y2 = y2)
+
+model2 <- stan_glm(y2~x2, data = df_12, refresh = 0)
+summary(model2)
+```
+
+
+```{r}
+plot(x = x2, y = y2,)
+abline(a = model2$coefficients[1], b = model2$coefficients[2])
+```
+#### Better way using a function. 
+Create function
+```{r}
+simulate_data <- function(b,a,sigma,n, max_x){
+  b <- c(b, a) #Beta matrix
+  n <- n #N observations
+  x <- runif(n, min = 0, max = max_x) #x
+  err <- rnorm(n, mean = 0, sd = sigma) #residul errors
+  y <- b[1] + b[2]*x + err
+  
+  return (tibble(x, y))
+}
+```
+
+simulate data with sigma = 3.9. 
+```{r}
+sim1 = simulate_data(b = 46.3, a = 3, sigma =  3.9, n = 2000, max_x = 4)
+stan_glm(y ~ x, data = sim1, refresh = 0)
+ggplot(sim1, aes(x = x, y = y)) + geom_point() + geom_abline(intercept = 46.3, slope = 3, color = "red", size = 1.5)
+```
+
+simulate data with sigma = 10.
+```{r}
+sim2 = simulate_data(b = 46.3, a = 3, sigma =  10, n = 2000, max_x = 18)
+
+stan_glm(y ~ x, data = sim2)
+
+ggplot(sim1, aes(x = x, y = y)) + geom_point() + geom_abline(intercept = 46.3, slope = 3, color = "red", size = 1.5)
+```
+
+#Chapter 2 
+
+### Exercise 2.3
+```{r}
+names <- read_csv("C:/Users/Bruger/OneDrive - Aarhus Universitet/Skrivebord/methods-2-course/Data for the book/Names/data/allnames_clean.csv")
+```
+
+
+```{r}
+install.packages("stringr")
+pacman::p_load(stringr)
+
+```
+
+
+```{r}
+#Filter for females only
+names_female <- names %>% 
+  filter(sex == "F")
+
+#Find the last letter in each name. 
+names_female <- names_female %>% 
+  mutate(last_letter = str_sub(names_female$name, -1)) %>% 
+  mutate(last_letter = as.factor(last_letter))
+
+#Create a variable with all names for the columns  containing count of frequency that year.
+years <- names(names_female)[4:134]
+
+
+#Find out how many people with last letter each year. 
+summarise_f_names <- names_female %>% 
+  group_by(last_letter) %>% 
+  summarise_at(years, sum, na.rm = TRUE)
+#See this for overview
+summarise_f_names
+```
+
+
+```{r}
+#We now trun the frequencies into percentages instead. 
+func_1 <- function(x, na.rm = TRUE) (x/sum(x))*100
+percentage_f_names<- summarise_f_names %>% 
+  mutate_at(years,  func_1)
+
+percentage_f_names
+```
+
+
+```{r}
+#Pivot longer so we get 1 row for each year with each letter. 
+final_df <- percentage_f_names %>% 
+  pivot_longer(cols = years ,names_to = "Year", values_to = "number") %>% 
+  mutate(Year = as.factor(Year)) %>% 
+  mutate(Year = as.numeric(Year))
+final_df
+```
+
+
+```{r}
+#plotting time
+final_df %>% 
+  ggplot(aes(x = Year, y = number, col = last_letter, group = last_letter)) + geom_line() + 
+  labs(y = "Percentage of people born with letter", title = "Overview of % girls born with a specific last letter each year", x = "Years after 1880") +  scale_x_continuous() + theme(axis.text.x = element_text(angle = -45)) 
+
+```
