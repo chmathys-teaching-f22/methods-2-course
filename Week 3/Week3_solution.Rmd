@@ -1,0 +1,336 @@
+---
+title: "week3"
+author: "Sigurd Fyhn Sørensen"
+date: "2/11/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+pacman::p_load(tidyverse)
+```
+
+# Chapter 5
+
+## 5.1 Discrete probability simulation: 
+Suppose that a basketball player has a 60% chance of making
+a shot, and he keeps taking shots until he misses two in a row. Also assume his shots are
+independent (so that each shot has 60% probability of success, no matter what happened before).
+__(a)__ Write an R function to simulate this process.
+
+```{r}
+basketball <- function(){
+  misses_in_a_row <- 0 #start with 0 misses
+  hits_in_a_row <- 0 #start with 0 hits 
+  shots <- 0
+  while (misses_in_a_row < 2){ #if we miss two in arow stop
+    hit <- rbinom(1, size = 1, prob = .6) #the bernoulli trial. 
+    if (hit == 1){ #check if hit
+      hits_in_a_row <- hits_in_a_row + 1 #add 1 to counter of number of hits
+      misses_in_a_row <- 0 #reset the misses in a row
+      shots <- shots +1 
+    }
+    else{ #If it were a miss 
+      misses_in_a_row <- misses_in_a_row +1 # add 1 to the counter of misses
+      shots <- shots +1
+    }
+  }
+  return(c(hits_in_a_row, shots))
+}
+
+basketball()
+```
+
+__(b__) Put the R function in a loop to simulate the process 1000 times. Use the simulation to estimate
+the mean and standard deviation of the total number of shots that the player will take, and plot
+a histogram representing the distribution of this random variable.
+```{r}
+total_shots <- c()
+hits <- c()
+
+for (i in 1:1000){
+  temp <- basketball()
+  hits[i] <- temp[1]
+  total_shots[i] <- temp[2]
+}
+
+
+paste(paste("mean shots taken" ,mean(total_shots)), "and", paste("std of total shots taken", sd(total_shots)))
+
+hist(total_shots)
+```
+
+__(c)__ Using your simulations, make a scatterplot of the number of shots the player will take and the
+proportion of shots that are successes.
+```{r}
+plot(x = total_shots, y = hits)
+```
+
+
+### 5.2Continuous probability simulation: 
+The logarithms of weights (in pounds) of men in the United
+States are approximately normally distributed with mean 5.13 and standard deviation 0.17;
+women’s log weights are approximately normally distributed with mean 4.96 and standard
+deviation 0.20. Suppose 10 adults selected at random step on an elevator with a capacity of 1750
+pounds. What is the probability that their total weight exceeds this limit?
+
+__answer:__
+The inverse of log() is exp()
+```{r}
+men_mean <- 5.13 ; men_sd <- 0.17
+women_mean <- 4.96 ; women_sd <- 0.2
+
+log_to_norm_mean <- function(mean, sd){
+  new_mean <- exp(mean + sd/2)
+  return(new_mean)
+}
+
+log_to_norm_sd <- function(mean, sd){
+  new_sd <- sqrt((exp(sd^2)-1)*exp(2*sd + mean))
+  return(new_sd)
+}
+
+women_mean_OG <- log_to_norm_mean(mean = women_mean, sd = women_sd)
+women_sd_OG <- log_to_norm_sd(mean = women_mean , sd = women_sd)
+
+men_mean_OG <- log_to_norm_mean(mean = men_mean, sd = men_sd) 
+men_sd_OG <- log_to_norm_sd(mean = men_mean, sd = men_sd )
+
+
+
+
+
+#add the two distributions
+combined_mean <- (men_mean_OG + women_mean_OG)/2
+# We assume that the men and women distribtuion is independent and therefore don't need to account of covariance. 
+combined_sd <- sqrt(men_sd_OG^2 + women_sd_OG^2)
+
+
+#Proability of the observations being 1750 or less. 
+#1 - minus that probabilit gives us the estimate. 
+1- pnorm(1750, mean = combined_mean*10, sd = combined_sd *10)
+  
+```
+
+### 5.3 Binomial distribution: 
+A player takes 10 basketball shots, with a 40% probability of making
+each shot. Assume the outcomes of the shots are independent.
+(a) Write a line of R code to compute the probability that the player makes exactly 3 of the 10
+shots.
+```{r}
+dbinom(3, size = 10, prob = .4)
+```
+
+(b) Write an R function to simulate the 10 shots. Loop this function 10 000 times and check
+that your simulated probability of making exactly 3 shots is close to the exact probability
+computed in (a).
+```{r}
+shots_hit_sim<- rbinom(1e4, size = 10 , prob = .4)
+
+sum(shots_hit_sim == 3)/1e4
+```
+Few decimal point differences but it is acceptable. 
+
+
+### 5.4 Demonstration of the Central Limit Theorem:
+Let x = x1 + · · · + x20, the sum of 20 independent
+uniform(0, 1) random variables. In R, create 1000 simulations of x and plot their histogram.
+What is the normal approximation to this distribution provided by the Central Limit Theorem?
+Overlay a graph of the normal density on top of the histogram. Comment on any differences
+between the histogram and the curve.
+```{r}
+df <- data.frame()
+for (i in 1:1000){
+  df[i,1] <- sum(runif(20, min = 0 , max = 1))
+}
+df
+
+ggplot(df, aes(x = V1)) + geom_histogram(aes(y = ..density..)) + stat_function(fun = dnorm, args = list(mean=mean(df$V1),sd=sd(df$V1)))
+
+```
+
+### 5.5 Distribution of averages and differences:
+The heights of men in the United States are approximately
+normally distributed with mean 69.1 inches and standard deviation 2.9 inches. The heights of
+women are approximately normally distributed with mean 63.7 inches and standard deviation
+2.7 inches. Let x be the average height of 100 randomly sampled men, and y be the average
+height of 100 randomly sampled women. In R, create 1000 simulations of x − y and plot their
+histogram. Using the simulations, compute the mean and standard deviation of the distribution
+of x − y and compare to their exact values.
+
+
+```{r}
+x_y <- c() ; x <- c() ; y <- c()
+for (i in 1:1000){
+  x[i] <- mean(rnorm(100 , mean = 69.1, sd = 2.9)) ; y[i] <- mean(rnorm(100, mean = 63.7, sd = 2.7))
+  x_y[i] <- x[i] - y[i] 
+}
+
+mean(x_y) ; sd(x_y)
+hist(x_y)
+
+
+```
+$$ \mu_{x-y}=\mu_x - \mu_y$$
+$$\sigma_{x-y}^2 = \sigma_x^2 + \sigma_y^2 - 2 * cov(x,y)$$
+
+$$\sigma_{x-y} = \sqrt{\sigma_x^2 + \sigma_y^2 - 2 * cov(x,y)}$$
+When we're sampling multiple means of many samples we get the sampling distribution of the sampling means which variation can be expressed as the standard error of the mean. $sem = sd / sqrt(n)$
+so our sigma = sem. 
+```{r}
+#exact values 
+
+#mean 
+69.1 - 63.7
+
+#standard error of the mean.
+sqrt((2.9/sqrt(100))^2 +  (2.7/sqrt(100))^2 - 2 * cov(x,y))
+
+```
+
+### 5.6 Propagation of uncertainty:
+We use a highly idealized setting to illustrate the use of simulations
+in combining uncertainties. Suppose a company changes its technology for widget production,
+and a study estimates the cost savings at $5 per unit, but with a standard error of $4. Furthermore,
+a forecast estimates the size of the market (that is, the number of widgets that will be sold)
+at 40 000, with a standard error of 10 000. Assuming these two sources of uncertainty are
+independent, use simulation to estimate the total amount of money saved by the new product
+(that is, savings per unit, multiplied by size of the market).
+
+["https://en.wikipedia.org/wiki/Distribution_of_the_product_of_two_random_variables"]
+$${\displaystyle \operatorname {Var} (XY)=(\sigma _{X}^{2}+\mu _{X}^{2})(\sigma _{Y}^{2}+\mu _{Y}^{2})-\mu _{X}^{2}\mu _{Y}^{2}}$$
+When two random variables are statistically independent, the expectation of their product is the product of their expectations.
+```{r}
+mean_1 <- 5 ; se_1 <- 4
+mean_2 <- 40000 ; se_2 <- 10000
+
+
+mean_xy <- mean_1 * mean_2
+var_xy <- (mean_1^2 + se_1^2)*(mean_2^2 + se_2^2) - mean_1^2 * mean_2^2
+
+print(paste("mean =", mean_xy, "; sd =" , var_xy))
+
+```
+
+
+### 5.8 Coverage of confidence intervals: 
+On page 15 there is a discussion of an experimental study of
+an education-related intervention in Jamaica, in which the point estimate of the treatment effect,
+on the log scale, was 0.35 with a standard error of 0.17. Suppose the true effect is 0.10—this
+seems more realistic than the point estimate of 0.35—so that the treatment on average would
+increase earnings by 0.10 on the log scale. Use simulation to study the statistical properties of
+this experiment, assuming the standard error is 0.17.
+
+(a) Simulate 1000 independent replications of the experiment assuming that the point estimate is
+normally distributed with mean 0.10 and standard deviation 0.17.'
+```{r}
+df_sim <- data.frame(V1 = rlnorm(127, meanlog = 0.10, sdlog = 0.17)) -1 
+
+for (i in 2:1000){
+  df_sim[,i] <- rlnorm(127, meanlog = 0.10, sdlog = 0.17) - 1
+}
+
+
+```
+
+(b) For each replication, compute the 95% confidence interval. Check how many of these intervals
+include the true parameter value.
+```{r}
+upper <- df_sim %>% 
+  summarise_all(function(x) mean(x)+qt(0.975, df = length(x)-1) * sd(x)/sqrt(length(x)))
+
+lower <- df_sim %>% 
+  summarise_all(function(x) mean(x)-qt(0.975, df = length(x)-1) * sd(x)/sqrt(length(x)))
+
+rbind(upper ,lower)
+
+
+
+
+paste("Number of simulation that contain the true vlaue in 95% confidence interval=", sum(upper >= 0.10 & lower <= 0.10))
+```
+
+(c) Compute the average and standard deviation of the 1000 point estimates; these represent the
+mean and standard deviation of the sampling distribution of the estimated treatment effect.
+```{r}
+sim_means <- df_sim %>% 
+  summarise_all(function(x) mean(x)) %>% 
+  pivot_longer(cols = everything())
+hist(sim_means$value)
+
+paste("mean of sampling dist =", mean(sim_means$value), "sd of sampling dist =", sd(sim_means$value))
+```
+If we assume the true effect being 0.10 we get a much more narrow estimate of the sampling distribution.
+
+### 5.9 Coverage of confidence intervals after selection on statistical significance:
+Take your 1000 simulations from Exercise 5.8, and select just the ones where the estimate is statistically
+significantly different from zero. Compute the average and standard deviation of the selected
+point estimates. Compare these to the result from Exercise 5.8.
+
+```{r}
+temp <- c()
+for (i in 1:ncol(df_sim)){
+  temp[i] <- t.test(df_sim[,i], mu = 0, alternative = "greater")$p.value
+}
+
+sum(temp >= 0)
+```
+
+
+### 5.11 Predictive checks:
+Using data of interest to you, fit a model of interest.
+(a) Simulate replicated datasets and visually compare to the actual data.
+(b) Summarize the data by a numerical test statistic, and compare to the values of the test statistic
+in the replicated datasets.
+
+
+### 5.12 Randomization:
+Write a function in R to assign n items to treatment and control conditions under
+the following assignment procedures:
+• Independent random assignment. Each item is independently randomly assigned to treatment
+or control with probabilities p and 1 − p.
+• Complete random assignment. The n items are randomly partitioned into np items that receive
+the treatment, and the other n(1 − p) are assigned to control.
+• Matched pairs. This is the simplest version of block random assignment. The n items come
+sequentially in n/2 pairs. Within each pair, one item is randomly chosen for treatment and
+one for control. In other words, p = 0.5.
+Write one R function, not three. Your function should have three inputs: n, p, and a code for
+which procedure to use. The output should be a vector of treatment assignments (1’s and 0’s).
+Hint: Your function likely won’t work for all combinations of n and p. If it doesn’t, write it so
+that it throws an error and alerts the user.
+
+```{r}
+block_randomization <- function(n,p,type){
+  if(type == 1){
+    dist <- rbinom(n, size = 1 , prob = p)
+  }
+  if (type == 2){
+    dist<- sample(c(0,1), size = n, replace = TRUE,  prob = c( n*(1-p), n*p ))
+  }
+  if (type == 3){
+    x <- seq(0,n, by = 1)
+    dist <- if_else((x %% 2) == 0, 0, 1)
+    
+  }
+  else{
+    warning("Type should be a number between 1:3")
+  }
+  return(dist)
+}
+
+block_randomization(n = 100 , p = 0.4 , type = 2)
+
+
+
+
+
+```
+
+### 5.13 Working through your own example: 
+Continuing the example from the final exercises of the
+earlier chapters, construct a probability model that is relevant to your question at hand and use it
+to simulate some fake data. Graph your simulated data, compare to a graph of real data, and
+discuss the connections between your model and your larger substantive questions.
