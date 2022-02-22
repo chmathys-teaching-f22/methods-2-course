@@ -1,0 +1,151 @@
+---
+title: "week_4_methods2_exercise.Rmd"
+author: "Sigurd Sørensen"
+date: "2/22/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Math notation
+While cognitive science is not a math degree several cog-sci papers and teaching books makes heavyli use of math notation. It is therefore important to get a fundamental understanding of math operators and notation so you will be able to read and understand formulas when they're presented to you. 
+
+So to practise the reading of math notation I'll present you with a few lines and it is your job to interpret them and translate into plain english. We will also do it in the reverse order where I present you a statement and you've to translate it into math notation. 
+
+
+Some of these examples are stupid but it is to get you comfy with the notation signs. 
+## Exercises on notation 
+If we wanna write math notation in markdowns we can make use of something called latex. Latex is a language for math notation that can be used in many editors and IDE. 
+
+In R you can start a latex notation by using $. In the same way that you can start a R chunk with 
+
+```{r setup, include=FALSE}
+
+```
+
+dollar signs initatite a latex chunk. 
+
+You can use double dollar signs
+$$
+\sum a_i = \sum b _i
+$$
+or single
+$ a = b $
+
+It only changes how the code is presented in the markdown. 
+
+### Lets get started with some exercises. 
+
+$$  \sum x_i >> \sum y_i,   $$
+__answer:__
+
+$$ X \in \mathbb{R}^+ $$
+__answer:__
+
+$$ Y \in \mathbb{I^}^+$$
+__answer:__
+
+$$ x \in \mathbb{R}^+ \therefore x \notin \mathbb{R}^- $$
+__answer:__
+
+$$ y > x \therefore x - y \in \mathbb{R}^-$$
+__answer:__
+
+$$ x \in \mathbb{I}^-  y \in \mathbb{I}^+ \therefore x + y  \in \mathbb{I} $$
+
+__answer:__
+
+$$ x \varpropto y \because x = c \cdot y  $$
+__answer:__
+
+$$ x \in \mathbb{I} \ and  \ x \notin \mathbb{I}^- \Rightarrow x \in \mathbb{I}^+ $$ 
+__answer:__
+
+
+### Part 2
+Now i'll present you for some statements that you should translate into logical statements using the notation learned from the chapter. 
+
+For a overview of latex commands see https://www.caam.rice.edu/~heinken/latex/symbols.pdf 
+and https://oeis.org/wiki/List_of_LaTeX_mathematical_symbols
+
+
+##### lets go
+Let x be the any number of postive integers and y be any negative integer. Therefore the product 
+of x and y must be a negative integer. 
+__answer:__
+$$ $$
+
+
+x is equal to 0 and a exist in the positive real numbers therefore a to the power of x is equal to 1. 
+__answer:__
+$$ $$
+
+
+The mean of y_hat is equal to the sum of of all y_i divded by the length of y_i which is an approximate of the mean of y.   
+__answer:__
+$$ $$
+
+
+x is proportional to y iff (if and only if) x = y * c
+__answer:__
+$$ $$
+
+
+
+**Make up your own example.**
+Make up a few of your own examples where you generate both the plain English and the math notation. 
+
+
+
+We will walk through some of these examples together. Continue with exercises from the book. 
+# Nested functions
+
+
+# Sets
+let x be a set {0,2,3,10,8,4,11}
+let y be a set {1,3,10,4,20,11}
+
+Find the following set z for each expression. 
+
+  1)
+$$ z = x \cup y  $$
+  2)
+$$ z =x \cap y $$
+
+  3)
+$$z = x \setminus y $$
+
+  4) 
+$$max(x) $$
+
+  5)
+$$ max(x \cap y)$$
+
+
+# Exercises from the book. 
+These exercises is to refresh some math fundamentals from high-school which will be useful for coming weeks. You can do most of these with pen and paper. 
+
+
+### 1.1 
+
+
+### 1.4 
+
+### 1.6
+
+
+### 1.9
+
+
+### 1.18 (hard)
+
+### 1.21
+
+### 1.22
+
+
+# After you're done. 
+If you finish look over all the other exercises and see if there is any that would trouble you. 
+If so then try and work through it yourself and raise your hand for help. :) 

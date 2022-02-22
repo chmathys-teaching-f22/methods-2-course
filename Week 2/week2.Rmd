@@ -1,0 +1,369 @@
+---
+title: "Week 2 Solution"
+author: "Sigurd Fyhn Sørensen"
+date: "2/3/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+pacman::p_load(rstanarm,tidyverse, ggpubr)
+```
+
+
+# Chapter 3
+
+### Exercise 3.1
+50% of 200 people age 19-29 supports the bill. 200/100*50 = 100supports
+60% of 250 people age 30-44 supports the bill.  250/100*50 = 150 supports 
+50% of 300 people age 45-64 supports the bill.  300/100*50 = 150 supports 
+30% of 250 people aged 65 and up supports the bill. 250/100*50 = 75supports
+
+total = 1000 people.
+
+```{r}
+poll_df <- data.frame(Age = c("19:29","30:44","45:64","65+"), People = c(200,250,300,250), 
+           percentage = c(0.5,0.6,0.5,0.3))
+
+#code way
+poll_df %>% 
+  summarise(sum(People*percentage)/sum(People))
+
+#Math way 1
+(200*0.5 + 0.6 * 250 + 0.5 * 300 + 0.3 * 250)/(200 + 250 + 300 +250) 
+#Math way 2
+200*0.5 + 0.6 * 250 + 0.5 * 300 + 0.3 * 250
+```
+
+### Exercise 3.2
+Give a set of weights to the four age categoties so that it = 0.4
+
+We can either do trial by error. But it is really smarter to setup an equation
+with 2:4 unknowns and solve it for one of the unknowns dependend on the rest. 
+
+$$ 0.4 = \frac{200*0.5 + 250 * 0.6 + 300 * y + 250 * x}{200 + 250 + 300 + 250}$$
+
+When we solve for x we get. 
+$$ x=\frac{3\left(-2y+1\right)}{5} $$
+
+We can now put any decimal perentage into x, y & z and get a v so that the entire equation = 0.4. 
+```{r}
+y = 0.4
+x = 3*(-2*y+1)/5
+
+0.4 == (0.5* 200 + 0.6 * 250 + y * 300 + x * 250)/(200 + 250 + 300 +250) 
+```
+With three unknowns. 
+
+$$ x=\frac{6-5z-6y}{5}$$ 
+```{r}
+y <-  0.1
+z <- 0.1
+x <-  (6-5*z-6*y)/5
+
+0.4 == (0.5* 200 + z * 250 + y * 300 + x * 250)/(200 + 250 + 300 +250) 
+```
+With 4 unknowns.
+
+$$ v=-\frac{5z+6y+5x-8}{4} $$ 
+
+```{r}
+x = 0.1
+y = 0.1
+z = 0.254 
+v = -(5*z+6*y+5*x-8)/4
+
+0.4 == (v* 200 + z * 250 + y * 300 + x * 250)/(200 + 250 + 300 +250) 
+```
+
+### Exercise 3.3 
+```{r}
+#Simulate numbers for a density distribution
+
+density_df <- data_frame(density_values = c(), mean_dens = c(), sd_dens = c())
+
+for (ii in 2:4){
+  for (i in 10:15){
+    temp <- rnorm(1000, mean = i ,  sd = ii)
+    mean = rep(i,1000)
+    sd = rep(ii, 1000)
+    
+    
+    density_df <- rbind(density_df, data_frame(density_values = temp , mean_dens =  mean, sd_dens = sd))
+  }
+}
+
+ggplot(density_df, aes(x = density_values, color = as.factor(mean_dens))) + geom_density(alpha = 0.4) + facet_grid(~as.factor(sd_dens))
+```
+### Exercise 3.4
+
+```{r}
+poisson_df <- data.frame(y = rpois(1000, 3.5))
+
+ggplot(poisson_df, aes(x = y)) + geom_bar()
+```
+
+### Exercise 3.5
+```{r}
+success <- 0:20
+
+plot(success, dbinom(success, size=20, prob=.3),type='h', 
+       ylab='Probability',
+       xlab ='# Number of Successes',
+       lwd=3)
+
+dbinom(20, size = 20, prob = .3)
+
+#What is the chance of getting exactly 1 six with 1 throw
+dbinom(1, size = 1, prob = 1/6)
+#Exacly 2 of the 10 throws.
+dbinom(2, size = 10, prob = 1/6)
+```
+The x-axis shows the number of successes and the y-axis shows the probability of obtaining that number of successes in 20 trials.
+
+
+### Exercise 3.6
+Current: x_sd = 10 x_mean = 35 
+Desired: y_sd = 15 y_mean = 100
+
+Use: y = a+bx 
+m2 = a 
+b = s2/s1
+b = x - m1
+
+$$ y_i=m2+(x_i−m1)×s2/s1 $$
+
+A)
+```{r}
+m1 <- 35
+m2 <- 100
+
+sd1 <- 10
+sd2 <- 15
+
+#Simulate the original data with m1 and sd1
+x = rnorm(1000, mean = m1, sd = sd1)
+
+
+
+
+#transform into the desired
+y = m2 + (x-mean(x))*sd2/sd(x)
+
+c(mean(y), sd(y))
+
+```
+B)
+```{r}
+c(min(y), max(y))
+```
+C)
+```{r}
+plot(x,y)
+```
+This shows that the transformation is indeed linear. 
+
+### 3.8 
+
+Mens height mean= 69.1 and SD = 2.9 
+Wives mean = 63.7 and SD = 2.7
+
+###### Assumptions
+We assume equal sample size. :)  
+
+###### Explanation
+Expectation (taking the mean) is a linear operator.
+
+This means that, amongst other things, E(X+Y)=E(X)+E(Y) for any two random variables X and Y (for which the expectations exist), regardless of whether they are independent or not.
+
+We can generalise (e.g. by induction) so that $$E(∑n_i=1X_i)=∑n_i=1E(X_i)$$ so long as each expectation E(Xi) exists.
+
+So yes, the mean of the sum is the same as the sum of the mean even if the variables are dependent. But note that this does not apply for the variance! So while $$Var(X+Y)=Var(X)+Var(Y) $$ for independent variables. But for variables which are dependent and correlated, the general formula is $$Var(X+Y)=sqrt(Var(X)+Var(Y)+2Cov(X,Y))$$ where Cov is the covariance of the variables.
+
+```{r}
+x1_mean = 69.1 ; x2_mean = 63.7
+x1_sd = 2.9 ; x2_sd = 2.7
+
+#mean 
+(x1_mean + x2_mean)
+#sd 
+sqrt(x1_sd^2 + x2_sd^2 + 2 * (0.3*(x1_sd*x2_sd)))
+
+```
+
+
+
+
+# Chapter 4
+
+#### Exercise 4.1
+Find the average treatment effect and its SE and average. 
+
+500 people got treatment (5$) and 50% of them responded on the survey,
+500 people got no treatment and 40% of them responded on the survey.
+
+What is the effect and SE of the treatment. 
+Find $$SE = \sqrt{(p_{hat}(1-p_{hat})/n} $$
+THen use SE of the the differnces $$ \sqrt{se_1^2 + se_2^2} $$
+```{r}
+n = 1000 ; n1 = 500 ; n2 = 500
+p1 = 0.5 ; p2 = 0.4
+
+#Treatment
+SE_treat = sqrt(p1*(1-p1)/n)
+
+#Control
+SE_control = sqrt(p2*(1-p2)/n)
+
+
+#The differences.
+SE_diff = sqrt(SE_treat^2+SE_control^2)
+
+c(SE_diff = SE_diff*100, effect = (p1-p2)*100)
+```
+
+#### Exercise 4.2
+Using the data on page 53. 
+
+how many people do you need befor ethe SE is less than 5 percentage points. 
+Well how many people you for a SE to be less than 5 percentage points depends on
+the SD if you're working continious variables or the p_hat if you're working with
+proporotions. 
+
+
+```{r}
+for (i in 1:300){
+  n <- i
+  ## Proportions
+  p_male <- 0.7 # made up
+  p_female <- 0.3 # made up
+  
+  se_male <- sqrt(p_male*(1-p_male)/n)
+  se_female <- sqrt(p_female*(1-p_female)/n)
+  
+  se_diff <- sqrt(se_male^2+se_female^2)
+  if (se_diff < 0.05){
+    print(paste(n, "people are required to get a SE below 5 percentage points if n is the same for both male and female."))
+    break
+  }
+}
+
+
+```
+
+#### Exercise 4.3 
+
+```{r}
+n_shots <- 20
+p_shoot1 <- 0.4 ; p_shoot2 <- 0.3
+
+#SE 
+SE_shoot1 <- sqrt(p_shoot1*(1-p_shoot1)/n_shots)
+SE_shoot2 <- sqrt(p_shoot2*(1-p_shoot2)/n_shots)
+
+
+SE_diff <- sqrt(SE_shoot1^2+SE_shoot2^2)
+magnitude <- (p_shoot1-p_shoot2)
+
+
+# We  wanna construct a confidence interval for the difference distribution that includes 0
+#10 - SE_diff*x = 0, Isolate for x, 10/SE_diff = x 
+
+# So this expression should = 0
+0 == 0.1-SE_diff*(0.1/SE_diff)
+
+#We look up our x in confidence interval tabel i.e. 0.66667
+0.1/SE_diff
+
+```
+Which gives us roughly a 50% chance of shooter 1 to score more times than shooter 2. 
+
+#### Exercise 4.4
+
+We are looking for 95% confidence. So we know that what we earlier described as x
+ie. 0.1/SE_diff has to be larger than 1.98 which is the value for 95% confidence interval. 
+```{r}
+for (i in 20:1000){
+  n_shots <-  i
+  SE_diff <- sqrt(sqrt(p_shoot1*(1-p_shoot1)/n_shots)^2 + sqrt(p_shoot2*(1-p_shoot2)/n_shots)^2)
+  if (1.98 < 0.1/SE_diff){
+    print(n_shots)
+    break
+  }
+}
+```
+We need n_shots = 177.
+
+#### Exercise 4.5
+read in any data.
+
+a) USe the sample function to draw rnadom sample of size 20. 
+b) Repeat the exercise to get a sense of the sampling distribution of the sample means. 
+
+```{r}
+view(iris)
+ggplot(iris, aes(x = Sepal.Width)) + geom_density() + geom_vline(xintercept = mean(iris$Sepal.Width))
+
+```
+
+
+```{r}
+# 1 Sample 
+mean(sample(iris$Sepal.Width, 20))
+```
+
+
+```{r}
+#Many samples
+#sample_distributions with different number of samples pulled
+test_diff_n <- function(n){
+  answer = c()
+  for (i in 1:n){
+    temp <- mean(sample(iris$Sepal.Width, 20))
+    answer <- append(answer,temp)
+  }
+  
+  df_sample_dist <- data.frame(means = answer)
+  
+  print(ggplot(df_sample_dist, aes(x = means)) + geom_density()+ labs(title = paste("Number of times drawn", n)))
+}
+```
+
+
+```{r}
+for (i in 20:160){
+  test_diff_n(n = i)
+}
+
+```
+#### Exercise 4.6
+
+
+```{r}
+
+
+```
+
+#### Exercise 4.7 
+Out of a random sample of 50 Americans 0 reported to have held political office. 
+so y = 0. however we know that some people have held office.... So something must be wrong 
+with this model. But we can still compute a 95% confidence interval when y = 0. 
+$$ p_{hat} = \frac{y+2}{n+4}, &  SE = \sqrt{p_{hat}(1-p_{hat})/(n+4)} $$
+
+```{r}
+p_hat = (0+2)/(50+4)
+se = sqrt((p_hat*(1-p_hat))/(50+4))
+c(upper = p_hat + 2*se, lower = p_hat - 2*se)
+```
+
+#### Exercise 4.8 
+```{r}
+
+```
+
+
+#### Exercise 4.9
+100 students 
