@@ -1,0 +1,136 @@
+---
+title: "week6_exercises_methods_2"
+author: "Sigurd Sørensen"
+date: "3/8/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Matrix calculation by hand. 
+
+![alt text here](exercise1.png")
+
+
+
+# Intro to matrix operations in R.
+
+```{r}
+pacman::p_load(tidyverse)
+```
+
+*Multiplication*
+```{r}
+matrix1 <- matrix(seq(1,10, by = 1), ncol = 2)
+
+matrix2 <- matrix(seq(1,10, by = 1), nrow = 2)
+
+# 5x2 premultiplied by 2x5 = 5x5
+matrix1 %*% matrix2
+
+# 2x5 premultiplied by 5x2 = 2x2 
+matrix2 %*% matrix1
+```
+
+*Transposing*
+```{r}
+matrix1
+
+# We can transpose using t()
+t(matrix1)
+```
+The first column is now the first row and so forth. 
+
+
+*Inverse*
+```{r}
+# solve() is used to find the inverse of a matrix
+solve(matrix1)
+```
+This gives us an error message that saying that we don't have a square matrix and therefore cannot find the inverse. 
+
+A matrix multiplied by its own transposed will always give us a square matrix. 
+```{r}
+t(matrix1) %*% matrix1
+```
+
+```{r}
+matrix1 %*% t(matrix1)
+```
+But as we can see the order still maters. If we take t(X) pre-multiplied by X we will get a square matrix with the size of the orignal X's number of columns. If the order of multiplcation is inversed we will of course get the new matrix with dimensions equal 
+to the orignal X's number of rows.
+
+You can test this yourself if you still don't believe me. ;) 
+
+
+We find the inverse of $(t(X)X)^{-1}$
+```{r}
+solve(t(matrix1) %*% matrix1)
+```
+
+
+Another issue that can arise with inversions of matrices. 
+```{r}
+matrix3 <- matrix( c(1,2,3,6) ,ncol = 2, nrow = 2)
+matrix3
+```
+We see that this matrix is a square matrix so we should be able to find the inverse,
+or should we?? Let's try it. 
+
+```{r}
+solve(matrix3)
+```
+It returns the message that is singular. What does that mean? How does it relate to the 
+our knowledge of the determinant? 
+
+*Determinant*
+We can find the determinant of matrix using the following det() function. 
+```{r}
+det(matrix3)
+```
+
+
+# Your turn in R. 
+
+## Exercise 1
+
+    1) Simulate random X variables (choose as many as you want) and make a design matrix
+    
+    2) Decide on your beta values and save it in a beta vector.  
+
+    3) Using matrix multiplication find y based on our beta vector and design matrix. 
+        3.1) Plot the relationship between y ~ x
+        3.2) Does something look odd? 
+        
+    4) Simulate errors and add it your y vector so that it becomes yhat. 
+        4.1) Plot the new y ~ x and the abline corresponding to our beta values. 
+        4.2) Is this more realistic than what we observed 3.2? 
+    
+    5) Using your knowledge of matrix inversion and the general linear model find the corresponding beta values to the yhat ~ x.
+        5.1) Did beta coefficinets match the ones you specified in the earlier example and               why/why not? 
+        5.2) run normal lm() on yhat ~ x. Does the beta coefficients match? 
+        5.3) When is it problematic to find the inverse of a matrix? How does it relate to the error message we sometimes get when running regression models: (isSingular)? 
+        
+        
+
+## Exercise 2
+```{r}
+data(mtcars)
+mtcars
+```
+
+    1) Using matrix multiplication find the beta values of the model: *mpg ~ hp + wt + am*
+
+```{r}
+
+```
+*hint:* Design Matrix, and y vector. 
+
+    2) Check if the output is the same as when you use the lm() function
+
+
+
+
