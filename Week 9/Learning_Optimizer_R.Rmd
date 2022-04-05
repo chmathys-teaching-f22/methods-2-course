@@ -1,0 +1,331 @@
+---
+title: "Economic games"
+author: "Sigurd Sørensen"
+date: "3/31/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Class 8 Different Optimizers and regression approahces. 
+We've been introduced to normal lm() linear regression function. But linear regression isn't just linear regression. There exist many different approaches and criteria for which that algorithm should optimize. Ordinary least squares (OLS) which you now know how to do algebraically using matrix multiplication. The least squares method tries to minimize error term $\epsilon_i = y_i - (a+b x_i) $. We cannot work with the error term directly since this would require us to know the true estimates of a and b. However we know the estimates of a and b which we can dentote as $\hat{a}$. The goal is therefore to minimize the residuals   $r_i = y_i -(\hat{a} + \hat{b}x_i)$. More precisely the residual sum of squares (RSS). Calculating the OLS algebraically can be very computaionally expensive so linear regression OLS algorithms usually use other tricks to find the $\theta$ that minimize RSS, remember $\theta$ is the symbol for all our parameter values (Beta-values among others). So we can also frame OLS as $\underset{\theta}{\arg\min f(x)}$. In a machine learning framework we would call the RSS = f(x) our cost-function or loss-function. We wanna minimize our cost/loss when doing regression.  
+
+But how would we implement such an optimizer in R?
+Well this among other things is what we're gonna learn today.
+  - How to use the optim() function for finding maximums and minimums of a function. 
+  - How to use the optim() function to find the $\theta$ for OLS.
+  - How to create your own custom made cost function for regression.
+  
+
+
+## Optim() function
+The optim() function in R is a minimization tool. It's goal is to the find x in a given function which minimizes f(x).
+
+### Polynomial()
+Let us start out by showing an example of on polynomial function. 
+
+```{r}
+# We first define our function, in our case it is a polynomial expression. 
+polynomial <- function(x){
+  f_x <- 10*x^2 + 2*x + 30 
+  return(f_x)
+}
+x_plot <- seq(-10,10, by = .05)
+
+#plot the function as a line (type = "l"). 
+plot(x_plot, polynomial(x_plot), type = "l")
+```
+We that there is a minimum around $x \approx 0$.
+
+**Question:**
+- Using what we know about derivatives how would find any local maximum and minimum points?
+
+- When having found an extremum how can you be sure it is a min or max? (think higher order derivatives.) 
+
+
+After having answered let us look at how we can do this operation in R. 
+
+```{r}
+#check out ?optim()
+?optim()
+```
+We can see that the function takes the following arguments, optim(par = initial values, fn = function to minimize, method = "Which algorithm to use", lower = "lower bound", upper = "upper bound".)
+
+```{r}
+#How to find the local minimum using Optim function()
+#Without derivative method
+optim(1, fn = polynomial, method= "Brent", lower = -10, upper = 10)
+```
+We get several different outputs. \$par indicates the x values which minimized f(x), and \$value indicates what the f(x) values is at the point x which minimized f(x).
+
+```{r}
+# with derivative
+optim(1, fn = polynomial, method = "CG")
+```
+We can see that using an algorithm which uses the derivatives is slightly different in its estimates of x which argmin f(x). While it isn't as precise and is more of an estimate it has the advantage of not requiring a lower and upper boundary. 
+
+
+### Sinus function. 
+We know that a sinus function has several minimums and maximums so how does the optim() function deal with that? We will follow the same prodcedure as before, first define the function then try and optimize it. 
+```{r}
+sin_function <- function(x){
+  f_x <- sin(x)
+  return(f_x)
+}
+x <- seq(-10,10 , by = .05)
+plot(x,sin_function(x), type = "l")
+```
+In the definition set of $d_f = (-10:10)$ we can see that there is roughly 3 local minimum. *1)* around x= 5, *2)* around x= -2, *3)* around x= -8. 
+
+```{r}
+#Optim will always find the local minimum which is the closest to the starting value.  
+x = -10
+repeat{
+  print(paste("for x = ", x," the closest minimum is at x =",optim(x, sin_function, method = "CG")$par))
+  x = x +1
+  if (x > 10) break("X limit reached")
+}
+```
+
+```{r}
+f <- function(x1,y1){
+ f_x <- (1-x1)^2 + 100*(y1- x1^2)^2
+ return(f_x)
+}
+x <- seq(-2,2,by=.15)
+y <- seq(-1,3,by=.15) 
+z <- outer(x,y,f) #All possible combination of x,y is used to calculate all possible f(x,y) = z. 
+
+#how to plot 3D
+persp(x,y,z,phi=45,theta=-45,col="yellow",shade=.00000001,ticktype="detailed")
+
+```
+Now the question is how to we find local minimums in 3D space? Well we know if there is to be no functional growth then our $\nabla f(x,y) = \vec{0}$. Check out this https://tutorial.math.lamar.edu/classes/calciii/relativeextrema.aspx for a deeper understanding. For a introduction to Hesse-Matrix and the ABC formula for finding saddle-points minimums and maximum check out https://najamogeltoft.medium.com/finding-the-minima-maxima-and-saddle-point-s-of-multivariable-functions-4ac4a547f22f 
+
+
+**Optim time.**
+When using optim for multidimensional optimization, the input in your function definition must be a single vector.
+
+```{r}
+f <- function(x){
+  f_x <- (1-x[1])^2 + 100*(x[2]-x[1]^2)^2
+  return(f_x)
+} 
+
+optim(c(0,0) , f)
+```
+The closest minimum to (x = 0, y= 0) is (x = 1, y = 1). Can we be sure that is the global minimum? Not as it currently stand, we could modify our algorithm to look broader or do some weighted search but this is one of the big issues with optmizers.   
+
+However, we are now quite close to a scenario in which we can optimize the RSS of simple regression model with an intercept and 1 predictor. Imagine that the X-axis is the different Beta_1 values and Y-axis is the different intercepts and the Z-axis is our cost/loss. We wanna find the intercept and slope or in other words the X and Y values which minimizes our RSS or Z-axis. All we need to do is create a function which calculates RSS based on our $\theta , X ,y$.
+
+I'll show you an example:
+```{r}
+set.seed(101) #random seed to reproduce results
+n <- 1e2
+x <- rnorm(n, 20, 2) # so this is 1e2x1 predictor matrix 
+y <- rnorm(n, mean = x *2, sd  =1 )                   # this is our outcome variable, a 1e2x1 vector
+X_matrix <- cbind(rep(1, 100), x)      # adding a column of 1s as intercept to the design matrix X (1e2 x 1)
+theta <- rep(0,2)               # set up the initial theta 2 x 1 vector
+```
+
+
+```{r}
+loss_function <-function(X, y, par){  
+  n <- length(y)
+  loss <- sum((X%*%par - y)^2)/(n-length(par))
+return(loss) 
+}
+```
+
+```{r}
+coef <- optim(par = theta, fn = loss_function , X = X_matrix, y = y, method = "BFGS")
+coef$par
+```
+We now have the two point estimates of our intercept: -1.1967 and slope: 2.057. But we know from methods 1 that there is uncertainty denoted as the SE surrounding these coefficients.
+
+```{r}
+
+
+SE_beta_calc <- function(X,y,theta){
+  n <- length(y)
+  x <- X[,2]
+  y_hat <- X %*% theta
+  
+  SE_beta <- ((1/(n-2)) *  (sum((y - y_hat)^2)) /  sum((x - mean(x))^2))
+  return(SE_beta)
+}
+
+SE_beta_calc(X_matrix, y , coef$par)
+```
+
+Using lm() we can see that it doesn't quite yield the same SE for our coefficients this is because it uses a stricter estimation. 
+```{r}
+summary(lm(y~ x))
+```
+Now it is time for you to get your hands dirty with the optim() function. 
+
+## Exercises
+
+1) Choose a mathematical function with 4 minimums in the definition set you have chosen. 
+  a) Hard code the functiom into R and plot it.
+  b) Find the 4 minimums using the optim() function. 
+  c) Check if the they are indeed minimums using the second derivative rule we learned last class. 
+  d) Find the maximums or in other words, find the x's with maximises f(x). (Hint: Optim() always minimizes the return() so maybe switch the sign? How can max become min? )
+  
+2) Using the above introduction to the linear regression using optim().
+  a) Create Nx5 design matrix with the intercept and 4 different predictors. 
+  b) Simulate y depended on the design matrix. (Hint: Make y dependend on all the different predictors.) don't forget to add some error. 
+  c) Create a loss function which we want to minimze (I would suggest RSS or MSE to start with.) 
+  d) Use optim() to find the beta coefficients which minimizes our cost function. 
+  
+
+3) It is time to start getting creative. 
+  a) Create a design matrix with one predictor and simulate y from that design matrix.
+  b) Make at least 3-5 cost functions which you think could make sense. 
+  c) Use optim() on the data from exercise 3a using your newly made cost functions. 
+  d) Try and plot the cost. (Hint: you need to simulate the intercept values and slope values to find the cost function which then can be plotted)
+
+
+
+### Exercises from the book. 
+**8.1**
+
+
+**8.2** 
+
+
+**8.3** 
+
+
+**8.4**
+
+**(extra)**
+
+#### Maximum Likelhood estimation
+using log-likelihood
+```{r}
+log_likelihood_function <- function(model, y){
+  y_hat = fitted.values(model)
+  temp_vec = y * log(p) + (1-y) * log(1-p)
+  return (sum(temp_vec))
+}
+```
+
+
+## Regression to the mean. 
+Since we have a slope coefficient below between 0-1 we have an instance of regression towards the mean. 
+
+A kid who's mother were 10 cm above average will them self be on average 10 * 0.79 = 7.9 cm higher than the average daughter. Since the daughter regressed towards the mean she is now more average in height.
+
+That daughter one day grows up to be a pretty woman gets married to rich good looking gent and they suddenly want kids. If the model holds the daughter of the daughter would then regress even more towards the mean since the daughter was 7.9 cm higher than average her daughter will then be 7.9 * 0.79 = 6.241 cm higher than the average daughter. 
+
+This would continue for generation and generation if weren't for the error term.
+
+
+We will now simulate this scenario with no error term. Watch close attention to the y-axis as we got from generation to generation. 
+```{r}
+#How many samples
+n <- 1e2
+slope <- 0.43
+#Simulate mothers height. 
+height_of_mothers <- rnorm(n, mean = 170, sd = 7.5)
+height_of_mothers_central <- height_of_mothers - mean(height_of_mothers)
+
+#Slope of 0.76
+height_of_daughters <- 170 + height_of_mothers_central * slope
+height_of_daughters_central <- height_of_daughters - mean(height_of_daughters)
+
+#run regression model
+lm_height <- lm(height_of_daughters ~ height_of_mothers_central)
+summary(lm_height)
+
+
+plot( y = height_of_daughters,  x= height_of_mothers_central)
+abline(a = lm_height$coefficients[1], b= lm_height$coefficients[2])
+```
+```{r}
+height_daughter_of_daughter <-170 + height_of_daughters_central * slope
+height_daughter_of_daughter_central <- height_daughter_of_daughter - mean(height_daughter_of_daughter)
+
+#plot
+plot(height_of_daughters_central, height_daughter_of_daughter)
+
+
+```
+```{r}
+height_daughter_of_daughter_of_daughter <- 170 + slope * height_daughter_of_daughter_central
+
+
+plot(height_daughter_of_daughter_central , height_daughter_of_daughter_of_daughter)
+```
+We can see that the slope slowly regresses towards the mean and if we repeated this enough times it would approximate a flat line. 
+
+However we know that we're not getting lower and lower and getting regressing towards the mean. Let's try and add some uncertainity. 
+
+```{r}
+#How many samples
+n <- 1e2
+slope <- 0.43
+#Simulate mothers height. 
+height_of_mothers <- rnorm(n, mean = 170, sd = 7.5)
+height_of_mothers_central <- height_of_mothers - mean(height_of_mothers)
+
+#Slope of 0.76
+height_of_daughters <- rnorm(n, mean = 170 + height_of_mothers_central * slope, sd = 7.5)
+height_of_daughters_central <- height_of_daughters - mean(height_of_daughters)
+
+#run regression model
+lm_height <- lm(height_of_daughters ~ height_of_mothers_central)
+summary(lm_height)
+
+
+plot( y = height_of_daughters,  x= height_of_mothers_central)
+abline(a = lm_height$coefficients[1], b= lm_height$coefficients[2])
+```
+```{r}
+height_daughter_of_daughter <- rnorm(n, mean = 170 + height_of_daughters_central * slope, sd = 7.5)
+height_daughter_of_daughter_central <- height_daughter_of_daughter - mean(height_daughter_of_daughter)
+
+#plot
+plot(height_of_daughters_central, height_daughter_of_daughter)
+
+
+```
+```{r}
+height_daughter_of_daughter_of_daughter <- rnorm(n , mean = 170 + slope * height_daughter_of_daughter_central, sd = 7.5)
+
+plot(height_daughter_of_daughter_central , height_daughter_of_daughter_of_daughter)
+```
+Adding uncertainty counteracts that which would otherwise regress towards the mean.
+
+### Your Turn:
+**Exercise 1**
+Which of the following statements would you choose to describe a beta coefficient for  Daughter_height ~ Mother_height(Centralized).
+      1) *The beta coefficient for mothers_height of* $\beta = 0.79 , SE = 0.10 , p < 0.05$ *shows the effect of mothers_height on daughter being 0.79 with a SE = 0.10.*
+      2) *The beta coefficient for mothers_height of* $\beta = 0.79 , SE = 0.10 , p < 0.05$
+      *shows that a mother one cm taller compared to another mother is suspected to have a daughter which is 0.79 cm higher with 95% confidence intervals of [0.59, 0.99].* 
+
+**Exercise 2**
+Come up with your own example of regression towards the mean: 
+  a) Simulate your own example with repeated dependent iterations.
+      1) With no error
+      2) With error
+      
+  b) Check each step with a linear regression and a plot.
+  
+
+
+### Exercises from the book. 
+**6.2** Programming fake-data simulation: Write an R function to: (i) simulate n data points from the model, y = a + bx + error, with data points x uniformly sampled from the range (0, 100) and with errors drawn independently from the normal distribution with mean 0 and standard deviation σ; (ii) fit a linear regression to the simulated data; and (iii) make a scatter plot of the data and fitted regression line. Your function should take as arguments, a, b, n, σ, and it should return the data, print out the fitted regression, and make the plot. Check your function by trying it out on some values of a, b, n, σ.
+ 
+**6.3** Variation, uncertainty, and sample size: Repeat the example in Section 6.2, varying the number of data points, n. What happens to the parameter estimates and uncertainties when you increase the number of observations?
+
+**6.4** Simulation study: Perform the previous exercise more systematically, trying out a sequence of values of n, for each simulating fake data and fitting the regression to obtain estimate and uncertainty (median and mad sd) for each parameter. Then plot each of these as a function of n and report on what you find.
+
+
+
+
+
+
