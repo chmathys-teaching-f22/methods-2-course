@@ -50,12 +50,14 @@ The first column is now the first row and so forth.
 ```{r}
 # solve() is used to find the inverse of a matrix
 solve(matrix1)
+
 ```
 This gives us an error message that saying that we don't have a square matrix and therefore cannot find the inverse. 
 
 A matrix multiplied by its own transposed will always give us a square matrix. 
 ```{r}
 t(matrix1) %*% matrix1
+
 ```
 
 ```{r}
@@ -100,12 +102,66 @@ det(matrix3)
 
     1) Simulate random X variables (choose as many as you want) and make a design matrix
     
+```{r} 
+
+# a matrix
+x <- 0:20
+a <- sample(x, 16)
+X <- matrix(a, nrow = 4)
+
+Y <- c(3, 6, 8, 9)
+
+cbind(X, Y)
+
+
+#transpose and times transpose with matrix 
+txt <-  t(X) %*% X 
+txt
+
+yty <- t(Y) %*% Y
+
+#find inverse
+invtxt <- solve(txt)
+
+#find beta
+beta <- invtxt %*% t(X) %*% Y
+beta
+
+# find the error
+mse <- (yty - t(beta) %*% t(X) %*% Y) / length(Y)
+mse
+
+
+```
+
+    
     2) Decide on your beta values and save it in a beta vector.  
+    
+```{r}
+
+beta <- c(3, 6, 8, 9)
+
+
+```
+
 
     3) Using matrix multiplication find y based on our beta vector and design matrix. 
         3.1) Plot the relationship between y ~ x
         3.2) Does something look odd? 
         
+```{r}
+
+y <- matrix %*% beta
+
+model <- lm(formula = y ~ matrix*beta)
+model
+
+plot(y)
+
+```
+        
+
+
     4) Simulate errors and add it your y vector so that it becomes yhat. 
         4.1) Plot the new y ~ x and the abline corresponding to our beta values. 
         4.2) Is this more realistic than what we observed 3.2? 

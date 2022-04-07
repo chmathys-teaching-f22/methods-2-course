@@ -1,0 +1,130 @@
+---
+title: "Portfolio2"
+author: "Ida Elmose Brøcker"
+date: "3/31/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+- *Type:* Individual assignment
+- *Due:* 10 April 2022, 23:59
+
+### 1. Square root function
+
+
+To compute the square root of a given positive number, I based the _R_ function upon the Newton-Rhapson method.This takes the form: 
+$x_1 \cong x_0 - \frac {f(x_0)}{f'(x_0)}$ 
+
+This calculates the square root by producing an approximation to the solutions of $f(x) = 0$ from a guess $(x_0)$ to a point $(x_1)$ which is closer to the solution.
+
+In this particular case we are interested in finding the square root of a positive number which is equivalent to finding the root of $f(x) = x2 − \mu = 0$ as explained in Gill's book this leaves us with the following:   $y = (x + a / x) \times 0.5$ after we have inserted the first derivative of the function in the Newton-Rhapson equation. 
+
+The _R_ function is constructed similar to the example in Gill's book where I used a While loop which is the _R_ equivalent to the Do- Untill- loop. In the function I start by estimating a number x (mu*0.5). In the while loop the Newton-Rhapson function is defined as y and it will loop until x is equal to y. If you insert a negative number the program will continue looping as it goes towards negative infinity. x will never approach y and the loop will never break. If you want it to compute square root for negative numbers you can apply the abs() function that takes the absolute value of the negative number and calculates the root of the positive number. 
+
+
+```{r}
+square_root <- function(mu) {
+  x <- mu*0.5
+  while (TRUE) {
+    y <- (x + mu / x) * 0.5
+    if (y == x) break
+    x <- y
+  } 
+  return(y)
+}
+```
+
+$$
+\\
+$$
+
+#### Examples
+
+```{r}
+
+square_root(9) 
+
+square_root(783)
+
+square_root(1000) 
+
+square_root(0.3) 
+
+
+```
+
+
+
+
+
+
+## 2. Power series derivatives
+
+
+#### Proof 1
+ 
+
+ Using the definition: $\begin{align*} \exp(x) &:= \sum_{n=0}^\infty \frac{x^n}{n!},\\[8pt] \end{align*}$ , we want to proof that  $$\newcommand{\dx}{\:\mathrm{d}x}
+\newcommand{\md}{\mathrm{d}}
+\newcommand{\dfdx}{\frac{\md}{\dx}}
+\begin{align*}
+    \dfdx \exp(x) &= \exp(x), \\[8pt] \end{align*} $$ 
+ 
+ Proof:     
+
+  $\begin{align*} \exp(x) &:= \sum_{n=0}^\infty \frac{x^n}{n!} = \sum_{n=0}^\infty \frac{1}{n!} x^{n},\\[8pt] \end{align*}$  we use the power rule to take the derivative: 
+ $\ \begin{align*} \dfdx \exp(x) &= \sum_{n=1}^\infty n \frac{1}{n!} x^{n-1},\\[8pt] \end{align*}$
+ $$
+ \\
+ $$
+ Thus 
+ $$\ \begin{align*} \dfdx \exp(x) &= \sum_{n=1}^\infty \frac{1}{(n-1)!} x^{n-1}\\[8pt] \end{align*}$$
+ 
+ We use the rule: $\begin{align*} \sum_{n=0}^\infty a_i + 1 &= \sum_{n=1}^\infty a_i \\[8pt] \end{align*}$  to change the summation index: 
+ 
+ $$\begin{align*} \dfdx \exp(x) &= \sum_{n=0}^\infty \frac{1}{n!} x^{n} = \exp(x) \\[8pt] \end{align*}$$
+
+$$
+\\
+$$
+
+#### Proof 2
+
+For this we want to proof that $\begin{align*} \dfdx \sin(x) &= \cos(x), \\[8pt] \end{align*}$  when using the definitions : $\begin{align*} \sin(x) &:= \sum_{n=0}^\infty \frac{(-1)^nx^{2n+1}}{(2n+1)!} \\[8pt] \end{align*}$ and $\begin{align*} \cos(x) &:= \sum_{n=0}^\infty \frac{(-1)^nx^{2n}}{(2n)!}.\end{align*}$
+
+To do this, we need to take the derivitive of sin(x):  $$\begin{align*}\cos(x) &= \dfdx (\sum_{n=0}^\infty \frac{(-1)^nx^{2n+1}}{(2n+1)!}) \\[8pt]
+\cos(x) &= \sum_{n=0}^\infty \frac{(-1)^n x^{2n}}{(2n)!}
+\end{align*}$$ 
+
+$$
+\\
+$$
+
+#### Proof 3
+
+The last proof is a trigonometric rule as well, stating that:  $$\begin{align*} \dfdx \cos(x) &= -\sin(x).
+\end{align*}$$ with $\begin{align*} \sin(x) &:= \sum_{n=0}^\infty \frac{(-1)^nx^{2n+1}}{(2n+1)!} \\[8pt] \end{align*}$ and $\begin{align*} \cos(x) &:= \sum_{n=0}^\infty \frac{(-1)^nx^{2n}}{(2n)!}.\end{align*}$
+
+We use the power rule to take the derivitive of cos(x):
+$$\begin{align*} \dfdx \cos(x) &= \sum_{n=1}^\infty (-1)^{n} 2n \frac{x^{2n-1}}{(2n)!} \\[8pt] 
+&= \sum_{n=1}^\infty (-1)^{n} \frac{x^{2n-1}}{(2n-1)!} \end{align*}$$
+
+We change the summation index: 
+
+$$\begin{align*}\dfdx \cos(x) &= \sum_{n=0}^\infty (-1)^{n+1} \frac{x^{2n+1}}{(2n+1)!} \end{align*}$$
+
+
+When applying the rule: $(-1)^n =-(-1)^{n+1}$, we end up with: 
+
+$$\begin{align*}\dfdx \cos(x) &= -\sum_{n=0}^\infty (-1)^{n} \frac{x^{2n+1}}{(2n+1)!} = -\sin(x) \end{align*}$$
+
+
+
+
+

@@ -1,0 +1,286 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Portfolio2},
+  pdfauthor={Ida Elmose Brøcker},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifluatex
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Portfolio2}
+\author{Ida Elmose Brøcker}
+\date{3/31/2022}
+
+\begin{document}
+\maketitle
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Type:} Individual assignment
+\item
+  \emph{Due:} 10 April 2022, 23:59
+\end{itemize}
+
+\hypertarget{square-root-function}{%
+\subsubsection{1. Square root function}\label{square-root-function}}
+
+To compute the square root of a given positive number, I based the
+\emph{R} function upon the Newton-Rhapson method.This takes the form:
+\(x_1 \cong x_0 - \frac {f(x_0)}{f'(x_0)}\)
+
+This calculates the square root by producing an approximation to the
+solutions of \(f(x) = 0\) from a guess \((x_0)\) to a point \((x_1)\)
+which is closer to the solution.
+
+In this particular case we are interested in finding the square root of
+a positive number which is equivalent to finding the root of
+\(f(x) = x2 − \mu = 0\) as explained in Gill's book this leaves us with
+the following: \(y = (x + a / x) \times 0.5\) after we have inserted the
+first derivative of the function in the Newton-Rhapson equation.
+
+The \emph{R} function is constructed similar to the example in Gill's
+book where I used a While loop which is the \emph{R} equivalent to the
+Do- Untill- loop. In the function I start by estimating a number x
+(mu*0.5). In the while loop the Newton-Rhapson function is defined as y
+and it will loop until x is equal to y. If you insert a negative number
+the program will continue looping as it goes towards negative infinity.
+x will never approach y and the loop will never break. If you want it to
+compute square root for negative numbers you can apply the abs()
+function that takes the absolute value of the negative number and
+calculates the root of the positive number.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{square\_root }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(mu) \{}
+\NormalTok{  x }\OtherTok{\textless{}{-}}\NormalTok{ mu}\SpecialCharTok{*}\FloatTok{0.5}
+  \ControlFlowTok{while}\NormalTok{ (}\ConstantTok{TRUE}\NormalTok{) \{}
+\NormalTok{    y }\OtherTok{\textless{}{-}}\NormalTok{ (x }\SpecialCharTok{+}\NormalTok{ mu }\SpecialCharTok{/}\NormalTok{ x) }\SpecialCharTok{*} \FloatTok{0.5}
+    \ControlFlowTok{if}\NormalTok{ (y }\SpecialCharTok{==}\NormalTok{ x) }\ControlFlowTok{break}
+\NormalTok{    x }\OtherTok{\textless{}{-}}\NormalTok{ y}
+\NormalTok{  \} }
+  \FunctionTok{return}\NormalTok{(y)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\[
+\\
+\]
+
+\hypertarget{examples}{%
+\paragraph{Examples}\label{examples}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{square\_root}\NormalTok{(}\DecValTok{9}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{square\_root}\NormalTok{(}\DecValTok{783}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 27.98214
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{square\_root}\NormalTok{(}\DecValTok{1000}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 31.62278
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{square\_root}\NormalTok{(}\FloatTok{0.3}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.5477226
+\end{verbatim}
+
+\hypertarget{power-series-derivatives}{%
+\subsection{2. Power series
+derivatives}\label{power-series-derivatives}}
+
+\hypertarget{proof-1}{%
+\paragraph{Proof 1}\label{proof-1}}
+
+Using the definition:
+\(\begin{align*} \exp(x) &:= \sum_{n=0}^\infty \frac{x^n}{n!},\\[8pt] \end{align*}\)
+, we want to proof that \[\newcommand{\dx}{\:\mathrm{d}x}
+\newcommand{\md}{\mathrm{d}}
+\newcommand{\dfdx}{\frac{\md}{\dx}}
+\begin{align*}
+    \dfdx \exp(x) &= \exp(x), \\[8pt] \end{align*} \]
+
+Proof:
+
+\(\begin{align*} \exp(x) &:= \sum_{n=0}^\infty \frac{x^n}{n!} = \sum_{n=0}^\infty \frac{1}{n!} x^{n},\\[8pt] \end{align*}\)
+we use the power rule to take the derivative:
+\(\ \begin{align*} \dfdx \exp(x) &= \sum_{n=1}^\infty n \frac{1}{n!} x^{n-1},\\[8pt] \end{align*}\)
+\[
+ \\
+ \] Thus
+\[\ \begin{align*} \dfdx \exp(x) &= \sum_{n=1}^\infty \frac{1}{(n-1)!} x^{n-1}\\[8pt] \end{align*}\]
+
+We use the rule:
+\(\begin{align*} \sum_{n=0}^\infty a_i + 1 &= \sum_{n=1}^\infty a_i \\[8pt] \end{align*}\)
+to change the summation index:
+
+\[\begin{align*} \dfdx \exp(x) &= \sum_{n=0}^\infty \frac{1}{n!} x^{n} = \exp(x) \\[8pt] \end{align*}\]
+
+\[
+\\
+\]
+
+\hypertarget{proof-2}{%
+\paragraph{Proof 2}\label{proof-2}}
+
+For this we want to proof that
+\(\begin{align*} \dfdx \sin(x) &= \cos(x), \\[8pt] \end{align*}\) when
+using the definitions :
+\(\begin{align*} \sin(x) &:= \sum_{n=0}^\infty \frac{(-1)^nx^{2n+1}}{(2n+1)!} \\[8pt] \end{align*}\)
+and
+\(\begin{align*} \cos(x) &:= \sum_{n=0}^\infty \frac{(-1)^nx^{2n}}{(2n)!}.\end{align*}\)
+
+To do this, we need to take the derivitive of sin(x):
+\[\begin{align*}\cos(x) &= \dfdx (\sum_{n=0}^\infty \frac{(-1)^nx^{2n+1}}{(2n+1)!}) \\[8pt]
+\cos(x) &= \sum_{n=0}^\infty \frac{(-1)^n x^{2n}}{(2n)!}
+\end{align*}\]
+
+\[
+\\
+\]
+
+\hypertarget{proof-3}{%
+\paragraph{Proof 3}\label{proof-3}}
+
+The last proof is a trigonometric rule as well, stating that:
+\[\begin{align*} \dfdx \cos(x) &= -\sin(x).
+\end{align*}\] with
+\(\begin{align*} \sin(x) &:= \sum_{n=0}^\infty \frac{(-1)^nx^{2n+1}}{(2n+1)!} \\[8pt] \end{align*}\)
+and
+\(\begin{align*} \cos(x) &:= \sum_{n=0}^\infty \frac{(-1)^nx^{2n}}{(2n)!}.\end{align*}\)
+
+We use the power rule to take the derivitive of cos(x):
+\[\begin{align*} \dfdx \cos(x) &= \sum_{n=1}^\infty (-1)^{n} 2n \frac{x^{2n-1}}{(2n)!} \\[8pt] 
+&= \sum_{n=1}^\infty (-1)^{n} \frac{x^{2n-1}}{(2n-1)!} \end{align*}\]
+
+We change the summation index:
+
+\[\begin{align*}\dfdx \cos(x) &= \sum_{n=0}^\infty (-1)^{n+1} \frac{x^{2n+1}}{(2n+1)!} \end{align*}\]
+
+When applying the rule: \((-1)^n =-(-1)^{n+1}\), we end up with:
+
+\[\begin{align*}\dfdx \cos(x) &= -\sum_{n=0}^\infty (-1)^{n} \frac{x^{2n+1}}{(2n+1)!} = -\sin(x) \end{align*}\]
+
+\end{document}
