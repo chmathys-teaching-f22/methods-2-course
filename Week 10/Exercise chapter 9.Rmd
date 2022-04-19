@@ -1,0 +1,193 @@
+---
+title: "Exercise 9 Methods2"
+author: "Sigurd Sørensen"
+date: "4/13/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(rstanarm)
+library(rstan)
+```
+# Classical framework
+```{r}
+swagg <- rnorm(1e2, mean = 10, sd = 2) #Random x values.
+y <- rnorm(1e2, mean = swagg * rnorm(1e2, 4, sd = 3) , sd = 2) #Uncertainty to beta value mean = 4. 
+drip <- y + rnorm(1e2, mean = 0, sd = 2) #error
+```
+Hypothesis that swag (attitude) causes better drip (dope clothing). 
+
+So we really wanna prove our hypothesis being true. We can run our normal linear regression model. But we remember that we can never prove a hypothesis we can only try and falsify it and failing to do so will give us support for our hypothesis. 
+
+```{r}
+#Model
+model <- lm(drip ~ swagg)
+summary(model)
+```
+We see the point estimate and the standard error which we can use to make a density plot showing the uncertainty in our swag's effect on drip.  
+```{r}
+plot(dnorm(-3:10, mean = model$coefficients[2], sd = 1.634 ), type = "l", xlab = "Beta1 Coefficient value", main = "Drip ~ Swag", xlim = c(-1,14))
+```
+
+In a Neyman/Pearson frequency statistic setting alpha is used for "level of significance". In other words, the probability of getting a value as extreme so we reject the H0 given the H0 is actually true. 
+			p = P(‘getting t as extreme or
+			more extreme than obtained’|H0 true)
+			
+Accepting normal significance (alpha = .05) levels will result in Type I error 5% of the time (1 in 20). Now you realize that setting the alpha level to α = 0.05 is the same as specifying how willing one is to obtain a Type I error.
+
+If we get significant p-values we reject the null-hypothesis. This is telling us that the data is conforming to the hypothesis. P(Data| Hypothesis) we don't make a direct inference on P(Hypothesis | Data). 
+
+
+# Bayes
+```{r}
+prior <- rep(1,14)
+plot(prior, type = "l", main = "Prior Dist for Beta Drip ~ Swag", xlab = "Beta coef value")
+```
+```{r}
+df <- data.frame(drip = drip , swagg = swagg)
+
+bayes_model <- stan_glm(drip ~swagg, data = df)
+summary(bayes_model)
+```
+**Access our samples:**
+```{r}
+samples <- as.matrix(bayes_model)
+
+dim(samples)
+head(samples)
+```
+```{r}
+c(median = apply(samples, 2, median))
+
+c(MAD = apply(samples, 2, mad))
+
+
+```
+```{r}
+par(mfrow = c(2,2))
+#Plot posterior distributions which is based on our samples. 
+plot(density(samples[,1]), main = "Intercept")
+
+plot(density(samples[,2]), main = "Slope")
+
+plot(density(samples[,3]), main = "Sigma")
+
+
+```
+
+
+```{r}
+#Sigma = 32.7 that is a high residual standard deviation so lets check.
+plot(drip ~ swagg)
+abline(a = bayes_model$coefficients[1], b = bayes_model$coefficients[2])
+```
+```{r}
+plot(density(bayes_model$residuals), main = "Residuals")
+mtext(paste("sd = ",sd(bayes_model$residuals), "mean =", mean(bayes_model$residuals)),side = 3, adj = 0.5, padj = .2)
+
+```
+## Predictions and uncertianity
+
+#### Point prediction
+```{r}
+#Define our "simulated data" which we wanna use to predict. 
+new <- data.frame(swagg = 2)
+#Point pred
+y_pointpred_drip <- predict(bayes_model, newdata = new)
+
+y_pointpred_drip
+bayes_model$coefficients[1] + bayes_model$coefficients[2]*new$swagg
+```
+There is some rounding off error in the $coefficients. 
+
+Here we only get a single estimate for how much drip a person with swag = 2 has. This estimate does not include our uncertainty about our coefficients nor the error.
+
+#### Linear prediction
+Linear prediction takes the uncertainty about our coefficients into account.
+```{r}
+y_linpred_drip <- posterior_linpred(bayes_model, newdata = new)
+hist(y_linpred_drip, main = "Histogram of predicted value for drip | swag = 2")
+```
+Due the uncertainty regarding our beta estimates we can have drip ranging from -40 to 60 when swag = 2, depending on the coefficients. We can of course compute confidence intervals, mean, median, SD etc. for this distribution.
+
+But we can see that our linear prediction vary greatly. 
+```{r}
+plot(NULL, xlim = c(-10,20), ylim= c(-100,100), main = "Different possible lines", xlab = "swag", ylab = "drip")
+for (i in 1:100) abline(a = samples[i,1],b = samples[i,2])
+abline(v = 2, col = "red", lwd =4)
+```
+
+
+#### Posterior Predict
+However, we know that our observed data points isn’t straight on the predicted line. Our data points are scattered around the line with some error. Our predictions should of course also include some error also. 
+
+```{r}
+y_postpred_drip <- posterior_predict(bayes_model, newdata = new)
+
+a <- samples[,1]
+b <- samples[,2]
+sigma <- samples[,3]
+
+y_post_drip <- a + b*new$swagg + rnorm(4000, 0 , sigma)
+```
+
+
+```{r}
+hist(y_postpred_drip)
+```
+#### with sequence combinations of variable values
+
+```{r}
+#One predictor
+new <- data.frame(swagg = 2)
+new2 <- data.frame(swagg = seq(0,100, by =1 ))
+new3 <- data.frame(swagg = rnorm(1e2, mean = 3, sd = 1))
+```
+
+
+imagine the model being drip ~ swagg + age. When doing simulations we would have to let our model know what age the person is. 
+```{r}
+#Several Predictors
+new1.1 <- data.frame(swagg = 2, age = 1) #both constant
+new1.2 <- data.frame(swagg =seq(0,100,by = 1), age = 1) #One constant one sequence
+
+
+#Both variables is a sequence. 
+new1.2 <- data.frame(swagg = seq(1,100, by = 1), age = rep(seq(12,21), 10)) 
+```
+You can of course choose to use normal distributed predictors or sequence or whatever simulation technique you want to get the right combination of age and swagg values you want to see their respective influence on drip. 
+
+# Exercises 
+
+## Chapter 9
+
+
+#### 9.1 Prediction for a comparison: 
+A linear regression is fit on high school students modeling grade
+point average given household income. Write R code to compute the 90% predictive interval for
+the difference in grade point average comparing two students, one with household incomes of
+40 000 and one with household income of 80 000.
+```{r}
+options(mc.cores = parallel::detectCores())
+
+lul <- data.frame(earning = c(4e4 , 8e4), gpa = c(6,8))
+
+stan_glm(gpa ~ earning, data = lul)
+```
+
+```{r}
+read_csv("C:/Users/sigur/Desktop/methods-2-course/Data for the book/KidIQ/data/kidiq.csv")
+```
+
+
+#### 9.2 Predictive simulation for linear regression: 
+Using data of interest to you, fit a linear regression. Use the output from this model to simulate a predictive distribution for observations with a
+particular combination of levels of all the predictors in the regression.
+
+
+
