@@ -16,11 +16,15 @@ library(rstan)
 ```
 # Classical framework
 ```{r}
+stan_g
 swagg <- rnorm(1e2, mean = 10, sd = 2) #Random x values.
 y <- rnorm(1e2, mean = swagg * rnorm(1e2, 4, sd = 3) , sd = 2) #Uncertainty to beta value mean = 4. 
 drip <- y + rnorm(1e2, mean = 0, sd = 2) #error
 ```
 Hypothesis that swag (attitude) causes better drip (dope clothing). 
+```{r}
+
+```
 
 So we really wanna prove our hypothesis being true. We can run our normal linear regression model. But we remember that we can never prove a hypothesis we can only try and falsify it and failing to do so will give us support for our hypothesis. 
 
@@ -31,7 +35,7 @@ summary(model)
 ```
 We see the point estimate and the standard error which we can use to make a density plot showing the uncertainty in our swag's effect on drip.  
 ```{r}
-plot(dnorm(-3:10, mean = model$coefficients[2], sd = 1.634 ), type = "l", xlab = "Beta1 Coefficient value", main = "Drip ~ Swag", xlim = c(-1,14))
+plot(density(rnorm(1e2, mean = model$coefficients[2], sd = 1.634 )), type = "l", xlab = "Beta1 Coefficient value", main = "Drip ~ Swag", xlim = c(-1,14))
 ```
 
 In a Neyman/Pearson frequency statistic setting alpha is used for "level of significance". In other words, the probability of getting a value as extreme so we reject the H0 given the H0 is actually true. 
@@ -162,32 +166,8 @@ new1.2 <- data.frame(swagg = seq(1,100, by = 1), age = rep(seq(12,21), 10))
 ```
 You can of course choose to use normal distributed predictors or sequence or whatever simulation technique you want to get the right combination of age and swagg values you want to see their respective influence on drip. 
 
-# Exercises 
-
-## Chapter 9
 
 
-#### 9.1 Prediction for a comparison: 
-A linear regression is fit on high school students modeling grade
-point average given household income. Write R code to compute the 90% predictive interval for
-the difference in grade point average comparing two students, one with household incomes of
-40 000 and one with household income of 80 000.
-```{r}
-options(mc.cores = parallel::detectCores())
-
-lul <- data.frame(earning = c(4e4 , 8e4), gpa = c(6,8))
-
-stan_glm(gpa ~ earning, data = lul)
-```
-
-```{r}
-read_csv("C:/Users/sigur/Desktop/methods-2-course/Data for the book/KidIQ/data/kidiq.csv")
-```
-
-
-#### 9.2 Predictive simulation for linear regression: 
-Using data of interest to you, fit a linear regression. Use the output from this model to simulate a predictive distribution for observations with a
-particular combination of levels of all the predictors in the regression.
 
 
 
