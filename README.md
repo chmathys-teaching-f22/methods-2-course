@@ -29,7 +29,7 @@ Should you want to deepen your knowledge of the mathematical content, I can reco
 | 8           | 13           | More calculus: root finding, extrema, Lagrange multipliers, vector calculus (Gill 6) |
 | 9           | 14           | Conceptual foundations and history of the GLM, model fitting (GHV 6,7,8)             |
 | 10          | 16           | Fitting GLMs: prediction, Bayesian inference (GHV 9)                                 |
-| 11          | 17           | Mutliple predictors, interactions (GHV 10)                                           |
+| 11          | 17           | Multiple predictors, interactions (GHV 10)                                           |
 | 12          | 18           | Model comparison, assumptions and diagnostics (GHV 11)                               |
 | 13          | 19           | Transformations, predictive simulations (GHV 12)                                     |
 
