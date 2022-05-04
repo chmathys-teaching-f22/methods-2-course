@@ -1,0 +1,285 @@
+---
+title: "Predictive Simulations"
+author: "Chris Mathys feat Sigurd"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+
+```{r}
+library(tidyverse)
+library(rstanarm)
+library(bayesplot)
+set.seed(0)
+```
+
+```{r}
+library(RColorBrewer)
+# display.brewer.pal(n = 8, name = 'Set1')
+colours <- brewer.pal(n = 8, name = 'Set1')
+```
+
+## Load the data
+
+This is a data set containing the score of children on a cognitive test along with various properties of the children's mothers.
+
+```{r}
+#Read in your own data. 
+(kidiq <- read_csv("C:/Users/sigur/OneDrive - Aarhus Universitet/methods_2/ROS-Examples-master/KidIQ/data/kidiq.csv")) %>% summary()
+```
+
+## Simulate from the prior distribution
+
+We choose a model with only one binary predictor, `mom_hs`, an indicator of whether the mother has completed high school. If we set the option `prior_PD = TRUE`, then `stan_glm()` will make all of its automatic adjustments to the default priors (cf. https://cran.r-project.org/web/packages/rstanarm/vignettes/priors.html), but it will then sample from the prior distributions of the parameters instead of their posteriors.
+
+```{r}
+(prior1 <- stan_glm(kid_score ~ mom_hs, data=kidiq, prior_PD = TRUE, refresh = 0)) %>%
+    print(digits = 2)
+```
+
+```{r}
+prior_summary(prior1)
+```
+
+You can see that the default priors are very wide.
+
+```{r}
+as_tibble(prior1) %>% summary()
+```
+
+In this context, it is worth noting that despite descriptions like "uninformative" or "weakly informative", priors are always informative. The prior probability mass will exert an attractive force wherever you place it. It is therefore best to make this choice explicit and justify it on the basis of prior knowledge and/or predictive performance of the model.
+
+## Simulate from the prior *predictive* distribution
+
+We can now choose particular values of the predictors and generate samples from the prior predictive distributions. The *prior predictive* distribution is the predicted distribution of *outcomes*, while the *prior* distribution is a distribution of the *parameters*. In our case, we want prior predictive samples for `mom_hs` equal to 0 and 1.
+
+```{r}
+(new <- tibble(mom_hs = c(0, 1)))
+```
+
+Somewhat counterintuitively, we use the function `posterior_predict()` also for *prior* predictive distributions. This function simply produces predictive distributions of outcomes, and whether the result is a prior or a posterior predictive depends only on which model (i.e., parameter distribution, here `prior1`) we pass to it.
+
+```{r}
+(y_prpd1 <- posterior_predict(prior1, newdata = new) %>%
+    as_tibble %>%
+    rename(mom_hs0 = 1, mom_hs1 = 2)) %>%
+    # What follows is a slight hack.
+    # We do this because we can't apply summary() to this particular tibble
+    as.matrix() %>%
+    summary()
+```
+
+Now let's get an impression of the distribution of our prior predictive samples.
+
+```{r}
+sd(y_prpd1$mom_hs0)
+sd(y_prpd1$mom_hs1)
+
+mcmc_intervals(y_prpd1, prob = 0.5, prob_outer = 0.8)
+```
+
+*Question*: Why is one predictive distribution so much wider than the other? Tip: look at the regression lines implied by the samples from the prior.
+
+The function `pp_check()` from the `bayesplot` pacckage generates predictive samples for all rows of the data matrix and displays smoothed density estimates of a random sample of them together with the smoothed density of the data. We can again see that the default priors must be quite wide if they lead to such a wide range of predictive distributions.
+
+```{r}
+pp_check(prior1)
+```
+
+We now do all this again, but with tighter priors.
+
+```{r}
+(prior1a <- stan_glm(kid_score ~ mom_hs,
+                     data=kidiq,
+                     prior_PD = TRUE,
+                     prior = normal(0, 0.25, autoscale = TRUE),
+                     prior_aux = exponential(0.1, autoscale = TRUE),
+                     refresh = 0)) %>%
+    print(digits = 2)
+
+
+```
+
+```{r}
+prior_summary(prior1a)
+```
+
+
+```{r}
+(y_prpd1a <- posterior_predict(prior1a, newdata = new) %>%
+    as_tibble %>%
+    rename(mom_hs0 = 1, mom_hs1 = 2)) %>%
+    # What follows is a slight hack.
+    # We do this because we can't apply summary() to this particular tibble
+    as.matrix() %>%
+    summary()
+```
+
+```{r}
+sd(y_prpd1a$mom_hs0)
+sd(y_prpd1a$mom_hs1)
+mcmc_intervals(y_prpd1a, prob = 0.5, prob_outer = 0.8)
+```
+
+*Question:* Why is the width of the two predictive distributions much more equal now than before?
+
+```{r}
+pp_check(prior1a)
+```
+
+We can see that with tighter priors, the prior predictive sticks more closely to the range of the observed data.
+
+## Sample from the posterior predictive distribution
+
+We now drop the option `prior_PD = TRUE` when fitting the model, i.e., we fall back on the default of `prior_PD = FALSE`. This produces samples from the posterior distributions of the parameters. Also, we go back to using `stan_glm()`'s default priors. 
+
+```{r}
+(fit1 <- stan_glm(kid_score ~ mom_hs, data=kidiq, refresh = 0)) %>%
+    print(digits = 2)
+```
+
+```{r}
+prior_summary(fit1)
+```
+
+
+```{r}
+(y_popd1 <- posterior_predict(fit1, newdata = new) %>%
+    as_tibble() %>%
+    rename(mom_hs0 = 1, mom_hs1 = 2)) %>%
+    # What follows is a slight hack.
+    # We do this because ee can't apply summary() to this particular tibble
+    as.matrix() %>%
+    summary()
+```
+
+```{r}
+mcmc_intervals(y_popd1, prob = 0.5, prob_outer = 0.8)
+```
+
+```{r}
+pp_check(fit1)
+```
+
+Then we do the same with our tighter priors.
+
+```{r}
+(fit1a <- stan_glm(kid_score ~ mom_hs,
+                   data=kidiq,
+                   prior = normal(0, 0.25, autoscale = TRUE),
+                   prior_aux = exponential(0.1, autoscale = TRUE),
+                   refresh = 0)) %>%
+    print(digits = 2)
+```
+
+```{r}
+prior_summary(fit1a)
+```
+
+
+```{r}
+(y_popd1a <- posterior_predict(fit1, newdata = new) %>%
+    as_tibble() %>%
+    rename(mom_hs0 = 1, mom_hs1 = 2)) %>%
+    # What follows is a slight hack.
+    # We do this because ee can't apply summary() to this particular tibble
+    as.matrix() %>%
+    summary()
+```
+
+```{r}
+mcmc_intervals(y_popd1a, prob = 0.5, prob_outer = 0.8)
+```
+
+```{r}
+pp_check(fit1a)
+```
+
+## Model comparison
+
+```{r}
+(loo1 <- loo(fit1))
+(loo1a <- loo(fit1a))
+```
+
+We can see that tightening our priors *by a factor of 10* hasn't hurt our model's predictive performance. On the other hand, we've gained much greater insurance against overfitting by using more informative priors. The general bias in the literature toward loose priors is in my view misplaced.
+
+```{r}
+loo_compare(loo1, loo1a)
+```
+
+## Exercise
+
+- Repeat the above with models for the same dataset that include more predictors and possibly also interactions.
+
+```{r}
+?stan_glm()
+
+head(kidiq)
+
+prior_fit1 <- stan_glm(
+    kid_score ~ mom_iq*mom_hs + mom_work, data = kidiq, refresh = 0 ,
+    family = gaussian(),
+    prior = normal(location= 0, scale = NULL, autoscale = T)
+)
+
+prior_summary(prior_fit1)
+
+
+prior_fit1A <-  stan_glm(kid_score ~ mom_iq*mom_hs + mom_work, data = kidiq, refresh = 0 , prior_PD = TRUE)
+```
+
+```{r}
+prior_summary(prior_fit1)
+```
+
+```{r}
+pp_check(prior_fit1)
+mcmc_intervals(prior_fit1)
+```
+
+```{r}
+#BABBADBA DBAD BAD BAD BADBAD BADBADBAD B
+new <- data.frame(mom_hs = rep(0:1,40), mom_work = rep(1:4,40), mom_iq = rnorm(40,mean = mean(kidiq$mom_iq), sd(kidiq$mom_iq)))
+
+(y_popd1b <- posterior_predict(prior_fit1, newdata = new) %>%
+    as_tibble() %>%
+    rename(mom_hs0 = 1, mom_hs1 = 2, mom_work = 3, mom_iq = 4)) %>%
+    # What follows is a slight hack.
+    # We do this because ee can't apply summary() to this particular tibble
+    as.matrix() %>%
+    summary()
+mcmc_intervals(y_popd1b)
+```
+```{r}
+new_ok <- data.frame(mom_hs = 1, mom_work = 4, mom_iq = rnorm(10,mean = mean(kidiq$mom_iq), sd(kidiq$mom_iq)))
+
+(y_popd1b <- posterior_predict(prior_fit1, newdata = new_ok) %>%
+    as_tibble() %>%
+    rename(mom_hs0 = 1, mom_hs1 = 2, mom_work = 3, mom_iq = 4)) %>%
+    # What follows is a slight hack.
+    # We do this because ee can't apply summary() to this particular tibble
+    as.matrix() %>%
+    summary()
+mcmc_intervals(y_popd1b)
+```
+
+```{r}
+(y_popd1a <- posterior_predict(prior_fit1A, newdata = new_ok) %>%
+    as_tibble() %>%
+    rename(mom_hs0 = 1, mom_hs1 = 2, mom_work = 3, mom_iq = 4)) %>%
+    # What follows is a slight hack.
+    # We do this because ee can't apply summary() to this particular tibble
+    as.matrix() %>%
+    summary()
+mcmc_intervals(y_popd1a)
+
+stan_glm(kid_score ~ factor(mom_iq), data = kidiq, refresh = 0)
+```
+```{r}
+
+```
