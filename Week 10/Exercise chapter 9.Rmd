@@ -16,7 +16,7 @@ library(rstan)
 ```
 # Classical framework
 ```{r}
-stan_g
+
 swagg <- rnorm(1e2, mean = 10, sd = 2) #Random x values.
 y <- rnorm(1e2, mean = swagg * rnorm(1e2, 4, sd = 3) , sd = 2) #Uncertainty to beta value mean = 4. 
 drip <- y + rnorm(1e2, mean = 0, sd = 2) #error
@@ -167,6 +167,17 @@ new1.2 <- data.frame(swagg = seq(1,100, by = 1), age = rep(seq(12,21), 10))
 You can of course choose to use normal distributed predictors or sequence or whatever simulation technique you want to get the right combination of age and swagg values you want to see their respective influence on drip. 
 
 
+```{r}
+bayes_model
+```
+
+
+```{r}
+
+
+post <- posterior_predict(bayes_model, newdata = new2)
+post
+```
 
 
 

@@ -28,10 +28,10 @@ Should you want to deepen your knowledge of the mathematical content, I can reco
 | 7           | 12           | Scalar calculus: derivatives, integrals, fundamental theorem (Gill 5)                |
 | 8           | 13           | More calculus: root finding, extrema, Lagrange multipliers, vector calculus (Gill 6) |
 | 9           | 14           | Conceptual foundations and history of the GLM, model fitting (GHV 6,7,8)             |
-| 10          | 16           | Fitting GLMs: prediction, Bayesian inference, multiple predictors (GHV 9,10)         |
-| 11          | 17           | Diagnostics, model evaluation, transformations (GHV 11,12)                           |
-| 12          | 18           | Generalized linear models: logistic regression (GHV 13,14)                           |
-| 13          | 19           | More generalized linear models, wrapup (GHV 15)                                      |
+| 10          | 16           | Fitting GLMs: prediction, Bayesian inference (GHV 9)                                 |
+| 11          | 17           | Multiple predictors, interactions (GHV 10)                                           |
+| 12          | 18           | Model comparison, assumptions and diagnostics (GHV 11)                               |
+| 13          | 19           | Transformations, predictive simulations (GHV 12)                                     |
 
 
 <sup>1</sup> Gelman, A., Hill, J., & Vehtari, A. (2020). *Regression and Other Stories* (Analytical Methods for Social Research). Cambridge: Cambridge University Press. [doi:10.1017/9781139161879](https://doi.org/10.1017/9781139161879)
