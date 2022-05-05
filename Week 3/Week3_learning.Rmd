@@ -23,12 +23,37 @@ I'll walk through a couple of code examples of how can create good function() wi
 Last start out with a quick recap of some of the functions and idea from last lecture. 
 
 In your own words describe the two different distributions and what they represent and how they differ from one another. 
+
+# rbinom gives us a number of random values from a simple with a given probability. To do this it needs three informations: 
+- Number of observations you want to see
+- Number of trials per observation
+- probability of success for each trial
+
+
+# dbinom gives us probability densities: probabilities of getting a certain values on a number of trials. It needs this information:
+- How many successes you want to investigate. It can be the probability of getting excactly 5 successes in n trials. Or an interval: getting 1:10 successes in n trials. 
+- Then how many trials you do
+- and the probability
+
 ```{r}
+# we have 10 dices. We want to get a six. How many sixes, do when we throw 10 dices? This is repeated 2e4 times. 
+
 x1 <- rbinom(2e4, size = 10, prob = 1/6)
+
 ```
+
+
 ```{r}
+# If we roll a dice, what is the probability of getting a given value from 1 to 10 times in 10 trials?
+# let's say, we want to get a 6 
+
 x2 <- dbinom(0:10, size = 10 , prob = 1/6)
+x2
+
 plot(x = 0:10, y = x2, type = "l")
+
+# the probability is highest that you get a 6 around 1 or 2 times. 
+
 ```
 ### Difference between two distributions. 
 treatment A has a E(X) = 10 with sd = 1.5
@@ -40,6 +65,15 @@ estimate the difference in effect between the two distributions.
   2. Estimate the uncertainty surrounding the point estimate difference.
 
 ```{r}
+
+ # The standard error is the standard deviation of an estimate
+
+# difference is 10-5 = 5 with standard error: 
+
+sqrt(1.5^2 + 2^2)
+
+# a standard error of 2.5
+
 
 ```
 
@@ -56,6 +90,8 @@ If I have an underlying idea about how many people eat the most candy on friday 
 
 ```{r}
 sample(c("friday","saturday"), size = 10, replace = TRUE, prob = c(0.55,0.45))
+
+
 ```
 Replace = TRUE is required if you want a list with occurences. Try and change it to false and see what happens. 
 
@@ -64,7 +100,7 @@ first element C("friday", "saturday") is our possible outcomes. and prob = c(0.8
 
 ```{r}
 #add sunday as another option and think add the proaability of sunday to the probability vector. 
-sample()
+sample(c("friday", "saturday", "sunday"), size = 10, replace = TRUE, prob = c(0.8, 0.7, 0.3))
 
 ```
 
@@ -75,9 +111,12 @@ A way to generate a vector of number bounded by the "from" and "to" statment. Wh
 ```{r}
 #generate the numbers from 2 to 100 with steps of whole integers (1)
 seq(from = 2, to = 100, by = 1)
+
 ```
+
 ```{r}
 seq(from = 100, to = 150 , by = 0.4)
+
 ```
 
 ### rep()
@@ -86,8 +125,11 @@ Used if we wanna repeat something multiple times.
 #repeat the number 1 one hundred times. 
 rep(1, 100)
 ```
+
+
 ```{r}
 rep(c(1,2), 100)
+
 ```
 Now it repeats the vector c(1,2) 100 times. So the total outcome is 200 numbers in a vector. 
 
@@ -98,6 +140,9 @@ It doesn't have to be integers it can also repeat operations. Look at the code b
 lul <- c(1,2,3)
 
 rep(sum(lul)/lul, 100)
+
+# sum = 6, så det er 6/1, 6/2, 6/3, hvert tal i vores vektor
+
 ```
 
 
@@ -110,6 +155,9 @@ x <- seq(from = 1 , to = 50, by = 0.5)
 for (i in 1:length(x)){
   print(sum(x)/sum(x[1:i]))
 }
+
+# 1. tal = sum(x)/1, næste er divideret med 2.5, næste er divideret med 4.5, den næste med 7, så forskellen mellem, hvad man dividerer med stiger med 0.5. først 1, så 1.5, så 2, så 2.5 osv... 
+
 ```
 
 # While loop
@@ -118,7 +166,7 @@ Here is an example of how to use while loops and the console as an input device.
 Try and run the entire chunk and the specify in the console how many numbers of the fibonacci chain you want. 
 ```{r}
 # take input from the user
-nterms = as.integer(readline(prompt="How many terms? "))
+nterms = as.integer(readline(prompt="How many terms?"))
 # first two terms
 n1 = 0
 n2 = 1
@@ -184,11 +232,31 @@ test_function <- function(n1,n2,n3){
   return(largest_sum)
 }
 
-test_function(2,5,9)
+test_function(6,0,-9)
+
+
 ```
 
 
 __Your try__: Try and make a fun function with a least some conditional statements. 
+
+```{r}
+
+my_function <- function(n1,n2){
+  if (n1/n2 < 1 ){
+    same <- paste("n1 / n2 =", n1 / n2)
+  }
+  if (n2/n1 < 1){
+    same <- paste("n2 / n1 =", n2 / n1)
+    
+  }
+  return(same)
+}
+
+my_function(6,8)
+
+
+```
 
 
 
@@ -200,6 +268,7 @@ What is the overall probability of having an Iq over 160 across left and right h
 ```{r}
 #We can use the weighted average 
 0.6*0.10 + 0.15*0.9
+
 ```
 This is a point estimate but there is of course some uncertainity which could be calculated using the 
 SD and SE for binomial data which we learned last time. 
@@ -246,3 +315,133 @@ __Following Exercises in Chapter 5:__
 5.1, 5.3, 5.4, 5.5 5.8, 5.9, 5.11, 5.12, 5.13
 
 5.2 (semi-hard), 5.6 (hard)
+
+
+
+## Exercise 5.1
+5.1 Discrete probability simulation: Suppose that a basketball player has a 60% chance of making a shot, and he keeps taking shots until he misses two in a row. Also assume his shots are independent (so that each shot has 60% probability of success, no matter what happened before).
+(a) Write an R function to simulate this process.
+(b) Put the R function in a loop to simulate the process 1000 times. Use the simulation to estimate the mean and standard deviation of the total number of shots that the player will take, and plot a histogram representing the distribution of this random variable.
+(c) Using your simulations, make a scatterplot of the number of shots the player will take and the proportion of shots that are successes.
+
+```{r}
+
+
+  # doesn't work   
+hit_sim <- function(x){
+  shots <- sample(c("hit","miss"), size = 1, replace = TRUE, prob = c(0.6, 0.4))
+  misses <- rep(0, n)
+for (i in 1:n) {
+  if (shots[i] == "miss" & shots[i-1] == "miss") {
+    misses[i] <- rbinom(1,size = 1, prob = .40)
+  }
+}
+return(misses)
+}
+
+
+
+# Works!
+n.sims <- 1000
+hit_sim <- function(prob) {
+  shots <- replicate(2, rbinom(1, 1, prob))
+ while ((shots[length(shots)] + shots[length(shots) - 1]) != 0) { 
+      shots <- c(shots, rbinom(1, 1, prob))
+ }
+return(shots)
+}
+hit_sim(0.6)
+
+
+
+#Another one
+n.sims <- 1000
+n.balls <- rep(NA, 1000)
+n.succ <- rep(NA, 1000)
+for (s in 1:n.sims) {
+    i=2
+    shot <- NA
+    shot[1] <- rbinom(1,1,.6)
+    while(i>1) {
+      shot[i] <- rbinom (1, 1, .6)
+      if(shot[i]==0 & shot[i-1]==0) break
+      i=1+i
+    }
+    
+    n.balls[s] <- i; n.succ[s] <- sum(shot==1)
+}
+
+hist (n.balls, main="Simulated no of shots until 2 fails (p=.6)")
+mean(n.balls)
+sd(n.balls)
+plot(n.balls, n.succ)
+
+```
+
+5.3 Binomial distribution: A player takes 10 basketball shots, with a 40% probability of making each shot. Assume the outcomes of the shots are independent.
+
+(a) Write a line of R code to compute the probability that the player makes exactly 3 of the 10 shots.
+(b) Write an R function to simulate the 10 shots. Loop this function 10 000 times and check that your simulated probability of making exactly 3 shots is close to the exact probability computed in (a)
+
+```{r}
+
+# a)
+x3 <- dbinom(3, size = 10 , prob = .4)
+x3
+
+# b)
+hit_sim <- function(n){
+  shots <- sample(c("hit","miss"), size = n, replace = TRUE, prob = c(0.6, 0.4))
+  misses <- rep(NA, n)
+  for (i in 1:n){
+    if (shots[i] == "hit"){
+      misses[i] <- rbinom(1, size= 10, prob = 0.4)
+    }
+    if (shots[i] == "miss"){
+      misses[i] <- rbinom(1,size = 10, prob = .6)
+    }
+  }
+  return(misses)
+}
+
+ vec <- hit_sim(10000)
+ vec
+ sum(vec == 3)/length(vec)
+ 
+ 
+
+  
+```
+
+# 5.4
+Demonstration of the Central Limit Theorem: Let 𝑥 = 𝑥1 + · · · + 𝑥20, the sum of 20 independent uniform(0, 1) random variables. In R, create 1000 simulations of 𝑥 and plot their histogram. What is the normal approximation to this distribution provided by the Central Limit Theorem? Overlay a graph of the normal density on top of the histogram. Comment on any differences between the histogram and the curve.
+
+
+
+```{r}
+
+x <- c()
+for (i in 1:1000){
+x[i] <- sum(runif(20, min= 0, max = 1))
+x
+}
+
+df <- data.frame(x=x)
+df1 <- data.frame(k = rnorm(1000))
+
+ggplot(df, aes(x)) + 
+geom_histogram(aes(y=..density..), 
+binwidth = .2, 
+colour = "black",fill ="white")+
+geom_density(data= df1,color="red")+
+geom_density(data=df,color="green")+
+ggtitle("Simulation Histogram Plot")+
+xlab("Data from df")+
+ylab("Density")
+
+
+?runif
+
+
+```
+

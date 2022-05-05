@@ -40,10 +40,11 @@ plot(x_plot, polynomial(x_plot), type = "l")
 We that there is a minimum around $x \approx 0$.
 
 **Question:**
-- Using what we know about derivatives how would find any local maximum and minimum points?
+- Using what we know about derivatives how would find any local maximum and minimum points? 
+$f'(x) = 0$
 
 - When having found an extremum how can you be sure it is a min or max? (think higher order derivatives.) 
-
+$f''(x)=0$ - if positive it's a minimum, if negative it's a maximum.
 
 After having answered let us look at how we can do this operation in R. 
 
@@ -54,9 +55,11 @@ After having answered let us look at how we can do this operation in R.
 We can see that the function takes the following arguments, optim(par = initial values, fn = function to minimize, method = "Which algorithm to use", lower = "lower bound", upper = "upper bound".)
 
 ```{r}
+
 #How to find the local minimum using Optim function()
 #Without derivative method
 optim(1, fn = polynomial, method= "Brent", lower = -10, upper = 10)
+
 ```
 We get several different outputs. \$par indicates the x values which minimized f(x), and \$value indicates what the f(x) values is at the point x which minimized f(x).
 
@@ -128,6 +131,7 @@ x <- rnorm(n, 20, 2) # so this is 1e2x1 predictor matrix
 y <- rnorm(n, mean = x *2, sd  =1 )                   # this is our outcome variable, a 1e2x1 vector
 X_matrix <- cbind(rep(1, 100), x)      # adding a column of 1s as intercept to the design matrix X (1e2 x 1)
 theta <- rep(0,2)               # set up the initial theta 2 x 1 vector
+
 ```
 
 
@@ -170,12 +174,108 @@ Now it is time for you to get your hands dirty with the optim() function.
 
 1) Choose a mathematical function with 4 minimums in the definition set you have chosen. 
   a) Hard code the functiom into R and plot it.
+  
+```{r}
+# sine function
+
+sin_function <- function(x){
+  f_x <- sin(x)
+  #return(f_x)
+}
+x <- seq(-10,15 , by = .01)
+plot(x,sin_function(x), type = "l")
+
+f <- sin_function(x)
+
+```
+  
+  
   b) Find the 4 minimums using the optim() function. 
+  
+```{r}
+
+x = -9
+
+repeat{
+  print(paste("for x = ", x," the closest minimum is at x =",optim(x, sin_function, method = "CG")$par))
+  x = x +6
+  if (x > 15) break("X limit reached")
+}
+```
+  
+  
+  
   c) Check if the they are indeed minimums using the second derivative rule we learned last class. 
+  
+```{r}
+
+f <- sin_function(x)
+
+pacman::p_load("Deriv")
+
+der <- Deriv(sin(x), "x")
+
+Deriv(der, "x")
+
+
+
+
+dfunc <- function(x) {
+  f_x<- -sin(x)
+  return(f_x)
+}
+
+x = seq(-10, 10, by = 0.05)
+par(mfrow= c(2,2))
+plot(x, dfunc(x), type = "l")
+plot(x, sin_function(x), type = "l")
+
+dfunc(1.5)
+
+
+dfunc(-1.57079678504682)
+
+
+```
+  
+  
   d) Find the maximums or in other words, find the x's with maximises f(x). (Hint: Optim() always minimizes the return() so maybe switch the sign? How can max become min? )
+  
+  
+```{r}
+
+x = -9
+
+repeat{
+  print(paste("for x = ", x," the closest minimum is at x =",optim(x, dfunc, method = "CG")$par))
+  x = x +6
+  if (x > 15) break("X limit reached")
+}
+
+
+
+```
+
+  
   
 2) Using the above introduction to the linear regression using optim().
   a) Create Nx5 design matrix with the intercept and 4 different predictors. 
+  
+```{r}
+
+
+mini <- c(-7.85398163599909, -1.57079678504682, 4.71238898037832, 10.9955742869413)
+maxim <- c(10, 23, 45, 65)
+noget<- c(3, 4, 5, 7)
+hej <- c(4, 5, 7, 8)
+
+
+model.matrix(~mini + maxim + noget + hej)
+
+
+```
+  
+  
   b) Simulate y depended on the design matrix. (Hint: Make y dependend on all the different predictors.) don't forget to add some error. 
   c) Create a loss function which we want to minimze (I would suggest RSS or MSE to start with.) 
   d) Use optim() to find the beta coefficients which minimizes our cost function. 

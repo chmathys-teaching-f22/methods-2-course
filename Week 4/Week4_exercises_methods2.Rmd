@@ -39,29 +39,29 @@ It only changes how the code is presented in the markdown.
 ### Lets get started with some exercises. 
 
 $$  \sum x_i >> \sum y_i,   $$
-__answer:__
+__answer:__ the sum of x1 is much greater than the sum of yi
 
 $$ X \in \mathbb{R}^+ $$
-__answer:__
+__answer:__ X is an elemnt of the set of positive real numbers
 
-$$ Y \in \mathbb{I^}^+$$
-__answer:__
+$$ Y \in \mathbb{I}^+$$
+__answer:__ Y is an element of the set of of positive integers
 
 $$ x \in \mathbb{R}^+ \therefore x \notin \mathbb{R}^- $$
-__answer:__
+__answer:__ x is an element of the set of positive real numbers, therefore x minus y is an element of the set of negative real numbers
 
 $$ y > x \therefore x - y \in \mathbb{R}^-$$
-__answer:__
+__answer:__y is greater than x, therefore x minus y is an element of the negative real numbers 
 
 $$ x \in \mathbb{I}^-  y \in \mathbb{I}^+ \therefore x + y  \in \mathbb{I} $$
 
-__answer:__
+__answer:__x is an element of the set of negative integers , y is an elemnt of the positive real numbers, therefore x + y is an element of the set of integers
 
 $$ x \varpropto y \because x = c \cdot y  $$
-__answer:__
+__answer:__ x is proportional to y, because x is equal to c times y 
 
 $$ x \in \mathbb{I} \ and  \ x \notin \mathbb{I}^- \Rightarrow x \in \mathbb{I}^+ $$ 
-__answer:__
+__answer:__ x is an element of the set of integers and x is not an elemnt of the set of negative integers, then x is an element of the set of positive integers 
 
 
 ### Part 2
@@ -75,17 +75,17 @@ and https://oeis.org/wiki/List_of_LaTeX_mathematical_symbols
 Let x be the any number of postive integers and y be any negative integer. Therefore the product 
 of x and y must be a negative integer. 
 __answer:__
-$$ $$
+$$ x \in \mathbb{I}^+ y \in \mathbb{I}^- \therefore x \cdot y  \in \mathbb{I}^-  $$
 
 
 x is equal to 0 and a exist in the positive real numbers therefore a to the power of x is equal to 1. 
 __answer:__
-$$ $$
+$$ x = 0 \ and\ \in \mathbb{R}^+ \therefore a^x = 1  $$
 
 
 The mean of y_hat is equal to the sum of of all y_i divded by the length of y_i which is an approximate of the mean of y.   
 __answer:__
-$$ $$
+$$ \hat{\bar{y}} $$
 
 
 x is proportional to y iff (if and only if) x = y * c
@@ -111,6 +111,8 @@ Find the following set z for each expression.
 
   1)
 $$ z = x \cup y  $$
+
+
   2)
 $$ z =x \cap y $$
 

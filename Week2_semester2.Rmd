@@ -1,0 +1,232 @@
+---
+title: "Week_2_2.semester"
+author: "Ida Elmose Brøcker"
+date: "9/2/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+
+###Exercise 3.1
+
+# 50% = 18-29 - 200
+# 60% = 30-44 - 250
+# 40% = 45-64 - 300
+# 30% = 60 and up  - 250
+
+(200*0.5 + 250 * 0.6 + 300 * 0.4 + 250 * 0.3) / (200+250+300+250)
+
+
+# 0.445 supports higher taxes 
+
+
+
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+
+###Exercise 3.3
+
+x <- seq(-3, 8, by = 1)
+y <- dnorm(x, mean = 3, sd = 1)
+
+plot(x, y, type = "l")
+
+
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+#### Exercise 3.4
+# Probability distributions: Using a bar plot in R, graph the Poisson distribution with parameter 3.5.
+```{r}
+
+p <- rpois(67889, lambda=3.5)
+
+hist(p)
+
+?rpois
+
+```
+
+
+#### Exercise 3.5
+# Probability distributions: Using a bar plot in R, graph the binomial distribution with 𝑛 = 20 and 𝑝 = 0.3.
+
+```{r}
+  x <- seq(0, 10, by = 1)
+  d <- dbinom(x, size=20, prob=0.3) 
+  
+  hist(d)
+```
+
+
+###Exercise 3.6
+#3.6 Linear transformations: A test is graded from 0 to 50, with an average score of 35 and a standard deviation of 10. For comparison to other tests, it would be convenient to rescale to a mean of 100 and standard deviation of 15.
+#(a) Labeling the original test scores as 𝑥 and the desired rescaled test score as 𝑦, come up with a linear transformation, that is, values of 𝑎 and 𝑏 so that the rescaled scores 𝑦 = 𝑎 + 𝑏𝑥 have a mean of 100 and a standard deviation of 15.
+#(b) What is the range of possible values of this rescaled score 𝑦?
+#(c) Plot the line showing 𝑦 vs. 𝑥.
+
+```{r}
+# a) 
+
+t <- seq(0, 50, by = 1)
+x <- rnorm(t, mean = 35, sd = 10)
+
+y <- x*1.50+50
+hist(y)
+
+
+# y = ax+b, so a = 1.5 and b = 50
+
+y <- (x-mean(x))+100
+hist(y)
+
+
+# b)
+range(y)
+
+# 78 og 144
+# eller er det 65 og 115??
+
+# c)
+curve(50 + 1.5*x, from=78, to=144)
+curve(1*x, from = 0, to = 50)
+
+
+
+```
+
+#### Exercise 4.1
+4.1 Comparison of proportions: A randomized experiment is performed within a survey. 1000 people are contacted. Half the people contacted are promised a $5 incentive to participate, and half are not promised an incentive. The result is a 50% response rate among the treated group and 40% response rate among the control group. Give an estimate and standard error of the average treatment effect.
+
+
+```{r}
+
+#estimate
+0.5*(500/1000)+0.4*(500/1000) #  0.45
+
+# SD
+sqrt((0.45*0.55)/1000) # 0.157
+
+
+
+```
+
+
+#### Exercise 4.2
+4.2 Choosing sample size: You are designing a survey to estimate the gender gap: the difference in support for a candidate among men and women. Assuming the respondents are a simple random sample of the voting population, how many people do you need to poll so that the standard error is less than 5 percentage points?
+
+```{r}
+?rpois
+
+  
+sqrt((0.45*0.55)/n) = 0.05
+(0.45*0.55)/n = 0.05^2
+0.45*0.55 = 0.05^2*n
+(0.45*0.55)/0.05^2 = n
+
+# you need 99 people
+
+
+
+
+```
+
+
+#### standardizing and normalizing
+
+```{r}
+
+
+t <- seq(0, 50, by = 1)
+x <- rnorm(t, mean = 35, sd = 10)
+
+normalized <- x-mean(x)
+standardized <- normalized*1/sd(normalized)
+hist(standardized)
+sd(standardized)
+mean(standardized)
+
+```
+
+#### Exercise 4.3
+4.3 Comparison of proportions: You want to gather data to determine which of two students is a better basketball shooter. One of them shoots with 30% accuracy and the other is a 40% shooter. Each student takes 20 shots and you then compare their shooting percentages. What is the probability that the better shooter makes more shots in this small experiment?
+```{r}
+
+# Expected
+#good
+0.4*20 #8
+
+#bad
+0.3*20 #6
+
+
+
+0.4-0.3 # 0.1 with standard error...
+
+#SE
+#good
+sqrt((0.4*0.6)/20) # 0.11
+
+#bad
+sqrt((0.3*0.7)/20) #0.1.02
+
+# SE diff
+sqrt(0.1095445^2 + 0.1024695^2) # 0.15
+
+# so theres a 0.1 probability that the better shooter makes more shots with a standard error of 0.15 - so it's basically equal if you don't have more throws. 
+
+
+ 
+```
+
+#### Exercise 4.4 
+4.4 Designing an experiment: You want to gather data to determine which of two students is a better basketball shooter. You plan to have each student take 𝑁 shots and then compare their shooting percentages. Roughly how large does 𝑁 have to be for you to have a good chance of distinguishing a 30% shooter from a 40% shooter?
+```{r}
+
+0.4-0.3 #0.1, so SE have to be less than 0.1 - we want 0.05
+
+sqrt((0.4*0.6)/n) = 0.05
+0.05^2 = (0.4*0.6)/n
+0.05^2*n = (0.4*0.6)
+(0.4*0.6)/0.5^2
+
+# we need 96 throws
+
+#SE
+#good
+sqrt((0.4*0.6)/96) # 0.05
+
+#bad
+sqrt((0.3*0.7)/96) # 0.04677072
+
+# SE diff
+sqrt(0.05^2 + 0.04677072^2) # 0.068
+
+
+```
+4.5 Sampling distribution: Download a data file on a topic of interest to you. Read the file into R and order the data by one of the variables.
+(a) Use the sample function in R to draw a simple random sample of size 20 from this population. What is the average value of the variable of interest in your sample? 
+(b) Repeat this exercise several times to get a sense of the sampling distribution of the sample mean for this example.
+
+```{r}
+
+```
+

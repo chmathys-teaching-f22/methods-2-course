@@ -1,0 +1,175 @@
+---
+title: "Portfolio1semester2"
+author: "Ida Elmose Brøcker"
+date: "3/7/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+- _Type:_ Group assignment
+- _Due:_ 13 March 2022, 23:59
+
+#### Exercise 1) 
+Given the vectors $\vec{u} = (1,1,1)$, $\vec{v} = (2,3,1)$, and
+$\vec{w} = (-1,-1,2)$, compute the following products:
+
+$$
+ a) \ \vec{u} \cdot \vec{v}
+ \\ b) \ \vec{u} \cdot \vec{w}
+ \\ c) \ \vec{v} \cdot \vec{w}
+  \\d) \ \vec{u} \times \vec{v}
+  \\e) \ \vec{u} \times \vec{w}
+ \\ f) \ \vec{v} \times \vec{w}
+$$
+
+###### a)
+
+$$
+   \ \vec{u} \cdot \vec{v} = 1 \cdot 2 \ + 1 \cdot 3 \ + 1 \cdot 1 =  \textbf{6} 
+$$   
+
+###### b) 
+
+$$
+     \ \vec{u} \cdot \vec{w} = 1 \cdot (-1) \ + 1 \cdot (-1) \ + 1 \cdot 2 =  \textbf{0} 
+$$
+
+###### c)
+
+$$  
+   \ \vec{v} \cdot \vec{w} = 2 \cdot (-1) \ + 3 \cdot (-1) \ + 1 \cdot 2 = \textbf{-3}
+$$
+
+
+###### d)
+
+$$
+     \ \vec{u} \times \vec{v} = [1 \cdot 1 - 1 \cdot 3, \ 1\cdot 2 - 1 \cdot 1, \ 1 \cdot 3-1\cdot 2]
+    \\ [1-3, \ 2-1, \ 3-2]
+$$
+$$
+ \ \mathbf {\vec{u} \times \vec{v} = [-2, \ 1, \ 1]} 
+$$
+
+
+###### e)
+
+$$  
+    \ \vec{u} \times \vec{w} = [1 \cdot 2 - 1 \cdot (-1), \ 1\cdot (-1) - 1 \cdot 2, \ 1 \cdot (-1) -1\cdot (-1)]
+    \\ [2+1, \ (-1)-2, \ (-1)+1]
+$$
+$$
+\mathbf {\vec{u} \times \vec{w} = [3, \ -3, \ 0]}
+$$
+
+
+###### f) 
+
+$$
+   \ \vec{v} \times \vec{w} =  [3 \cdot 2 - 1 \cdot (-1), \ 1\cdot (-1) - 2 \cdot 2, \ 2 \cdot (-1) -3\cdot (-1)]
+    \\ [6+1, \ (-1)-4, \ (-2)+3]
+$$
+
+$$
+\mathbf {\vec{v} \times \vec{w} = [7, \ -5, \ 1]}
+$$
+
+#### Exercise 2) 
+
+$$
+\\
+$$
+
+##### a) 
+To find a vector that is perpendicular to both $\vec{u} = (1,0,1)$ and $\vec{v} = (1,2,0)$ we compute the cross product as it per definition will give a vector that is orthogonal to the two vectors. 
+
+$$
+\ \vec{u} \times \vec{v} = [0 \cdot 0 - 1 \cdot 2, \ 1\cdot 1 - 1 \cdot 0, \ 1 \cdot 2 - 0\cdot 1]
+$$
+Their cross product is: 
+
+$$
+\vec{u} \times \vec{v} = [-2, \ 1, \ 2]
+$$
+
+To be confident that this vector is truly orthogonal to both, we can check it by calculating the dot product with our new vector and $\vec{u}$ and $\vec{v}$ where the following rule apply: $\vec{x} \perp \vec{y} \Longleftrightarrow \vec{x} \cdot \vec{y} = 0$
+
+First with $\vec{u}$:
+
+$$
+\ \vec{u} \times \vec{v} \ \cdot \vec{u}  = (-2) \cdot 1 \ + 1 \cdot 0 \ + 2 \cdot 1 = 0 
+$$
+
+and vector $\vec{v}$:
+
+$$
+\vec{u} \times \vec{v} \ \cdot \vec{v} = (-2) \cdot 1 \ + 1 \cdot 2 \ + 2 \cdot 0 = 0 
+$$
+
+
+As the dot products for both is 0, we know that $\vec{u} \times \vec{v}$ is orthogonal to both. 
+ A _unit vector_ is a vector with norm 1: $\Vert \vec{x} \Vert = 1$, so to get a unit vector, we normalize $\vec{u} \times \vec{v}$ by dividing it with it's magnitude.
+ The magnitude is found using pythagoras: 
+ 
+ $$
+\Vert \vec{x} \Vert = \sqrt(x_1^2 + x_2^2 +x_3^2)   
+ $$
+ 
+This gives us a lenght of: 
+
+$$
+\Vert \vec{u} \times \vec{v} \Vert = \sqrt((-2)^2 + 1^2 + 2^2)   
+\\ \sqrt(4+1+4)
+\\ \sqrt(9) = 3
+$$
+
+We divide our vector $\vec{u} \times \vec{v} = [-2, \ 1, \ 2]$ with it's lenght, $\Vert \vec{u} \times \vec{v} \Vert = 3$ to get the unit vector
+
+$$
+\frac {\vec{u} \times \vec{v}} {\Vert \vec{u} \times \vec{v} \Vert} = \frac {[(-2), \ 1, \ 2]} {3}
+$$
+
+So the unit vector that is orthogonal to both, has the following coordinates: 
+
+$$
+\mathbf {\frac {\vec{u} \times \vec{v}} {\Vert \vec{u} \times \vec{v} \Vert} = [\frac {(-2)} {3}, \ \frac {1}{3}, \ \frac {2} {3}] }
+$$
+
+
+##### b)
+
+In order to find a vector that is orthogonal both to $\vec{u}_1 = (1,0,1)$ and $\vec{u}_2 = (1,3,0)$, and whose dot product with the vector $\vec{v} = (1,1,0)$ is equal to 8, we calculate the cross product of  $\vec{u}_1$ and $\vec{u}_2$ as for 2a: 
+
+$$
+\vec{u}_1 \times \vec{u}_2 = [0 \cdot 0 - 1 \cdot 3, \ 1\cdot 1 - 1 \cdot 0, \ 1 \cdot 3 - 0\cdot 1]
+\\ [-3, \ 1, \ 3]
+$$
+
+So $\vec{u}_1 \times \vec{u}_2 = [-3, \ 1, \ 3]$ is orthogonal to both $\vec{u}_1 = (1,0,1)$ and $\vec{u}_2 = (1,3,0)$. We now calculate the dot product of $\vec{u}_1 \times \vec{u}_2$ and $\vec{v}$  
+
+$$
+\vec{u}_1 \times \vec{u}_2 \cdot \vec{v} = [(-3) \cdot 1 + 1 \cdot 1 + \ 3 \cdot 0]
+\\ \vec{u}_1 \times \vec{u}_2 \cdot \vec{v} = -2
+$$
+
+When multiplying a vector with a scalar only the length will change, not the direction, and since $\vec{v}$ is a _unit vector_, we can multiply $\vec{u}_1 \times \vec{u}_2$ with -4 to get $\vec{u}_1 \times \vec{u}_2 \cdot \vec{v} = 8$ 
+
+$$
+(\vec{u}_1 \times \vec{u}_2) \cdot(-4) = [-3\cdot (-4), 1\cdot (-4), 3 \cdot (-4)] 
+$$
+
+The new vector, let's call it $\vec{x}$ has the following coordinates: 
+
+$$
+\mathbf{\vec{x} = [12, \ -4, \ -12]}
+$$
+
+Let's check that it's dot product with $\vec{v}$ is in fact 8
+
+$$
+\vec{x} \cdot \vec{v} = [12 \cdot 1 + (-4) \cdot 1 + \ (-12) \cdot 0] 
+\\ [12-4] = 8
+$$
